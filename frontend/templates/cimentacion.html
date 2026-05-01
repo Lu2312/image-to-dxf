@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Cimentación — ArqGen</title>
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
+  <a href="/cimentacion" class="active">Cimentación</a>
+  <a href="/planta">Planta</a>
+  <a href="/carpinteria">Carpintería</a>
+  <a href="/texto">Texto→DXF</a>
+  <a href="/imagen">Imagen→DXF</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="container">
+  <h1 style="margin-bottom:1.5rem">🏗️ Expediente Técnico de Cimentación</h1>
+
+  <div class="tool-layout">
+
+    <!-- ===== FORM ===== -->
+    <div class="panel">
+      <h2>Parámetros del proyecto</h2>
+
+      <div class="form-group">
+        <label>Nombre del proyecto</label>
+        <input id="project_name" value="Vivienda Tipo A"/>
+      </div>
+
+      <div class="form-group">
+        <label>Ejes en X (mm, separados por coma)</label>
+        <input id="ejes_x" value="0, 3000, 6000"/>
+        <small style="color:var(--muted);font-size:.75rem">Ej: 0, 3000, 6000, 9000</small>
+      </div>
+
+      <div class="form-group">
+        <label>Ejes en Y (mm, separados por coma)</label>
+        <input id="ejes_y" value="0, 4000, 8000"/>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Espesor de muro (mm)</label>
+          <input id="espesor_muro" type="number" value="150" min="120" max="400"/>
+        </div>
+        <div class="form-group">
+          <label>Ancho zapata corrida (mm)</label>
+          <input id="ancho_zapata" type="number" value="500" min="400" max="2000"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Peralte zapata (mm)</label>
+          <input id="alto_zapata" type="number" value="350" min="300" max="1000"/>
+        </div>
+        <div class="form-group">
+          <label>Desplante (mm)</label>
+          <input id="desplante" type="number" value="600" min="400" max="3000"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Varilla longitudinal</label>
+          <select id="varilla_long">
+            <option>No.3</option>
+            <option selected>No.4</option>
+            <option>No.5</option>
+            <option>No.6</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Varilla transversal</label>
+          <select id="varilla_trans">
+            <option>No.3</option>
+            <option selected>No.4</option>
+            <option>No.5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Separación long. (mm)</label>
+          <input id="sep_long_mm" type="number" value="200" min="100" max="300"/>
+        </div>
+        <div class="form-group">
+          <label>f'c (kg/cm²)</label>
+          <input id="fc" type="number" value="200" min="150" max="400"/>
+        </div>
+      </div>
+
+      <div id="ntc-box"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runPreview()">
+          <div class="spinner" id="sp-prev"></div>
+          ▶ Preview
+        </button>
+        <button class="btn btn-success" onclick="download('dxf')">⬇ DXF</button>
+        <button class="btn btn-success" onclick="download('pdf')">⬇ PDF</button>
+        <button class="btn btn-success" onclick="download('excel')">⬇ Excel</button>
+      </div>
+    </div>
+
+    <!-- ===== PREVIEW ===== -->
+    <div class="preview-pane" id="preview-pane">
+      <div class="preview-tabs">
+        <button class="tab-btn active" data-tab="tab-svg">Vista previa</button>
+        <button class="tab-btn" data-tab="tab-cat">Catálogo</button>
+        <button class="tab-btn" data-tab="tab-ntc">NTC</button>
+      </div>
+      <div class="tab-content active" id="tab-svg">
+        <div id="svg-container" style="min-height:300px;display:flex;align-items:center;justify-content:center;color:var(--muted);">
+          Haz clic en <strong style="color:var(--text)">▶ Preview</strong> para ver el plano.
+        </div>
+      </div>
+      <div class="tab-content" id="tab-cat">
+        <div id="cat-container" style="color:var(--muted)">Sin datos.</div>
+      </div>
+      <div class="tab-content" id="tab-ntc">
+        <div id="ntc-container"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <strong>ArqGen</strong> — NTC-RCDF | Cimentación | <a href="/docs" style="color:var(--accent2)">API Docs</a>
+</footer>
+
+<script src="/static/js/arqgen.js"></script>
+<script>
+  initTabs(document.getElementById("preview-pane"));
+
+  function getBody() {
+    return {
+      project_name: document.getElementById("project_name").value,
+      ejes_x:  document.getElementById("ejes_x").value.split(",").map(Number),
+      ejes_y:  document.getElementById("ejes_y").value.split(",").map(Number),
+      espesor_muro: +document.getElementById("espesor_muro").value,
+      ancho_zapata: +document.getElementById("ancho_zapata").value,
+      alto_zapata:  +document.getElementById("alto_zapata").value,
+      desplante:    +document.getElementById("desplante").value,
+      varilla_long:  document.getElementById("varilla_long").value,
+      varilla_trans: document.getElementById("varilla_trans").value,
+      sep_long_mm:  +document.getElementById("sep_long_mm").value,
+      fc: +document.getElementById("fc").value,
+      fy: 4200,
+    };
+  }
+
+  async function runPreview() {
+    const sp = document.getElementById("sp-prev");
+    sp.style.display = "inline-block";
+    try {
+      const data = await apiPost("/api/cimentacion/preview", getBody());
+      document.getElementById("svg-container").innerHTML = data.svg;
+      renderNTC(document.getElementById("ntc-container"), data.ntc);
+      renderCatalog(document.getElementById("cat-container"), data.catalog);
+    } catch(e) {
+      document.getElementById("svg-container").innerHTML =
+        `<p style="color:var(--danger)">${e.message}</p>`;
+    } finally { sp.style.display = "none"; }
+  }
+
+  async function download(type) {
+    try {
+      const ext = { dxf: ".dxf", pdf: ".pdf", excel: ".xlsx" }[type];
+      const blob = await apiPost(`/api/cimentacion/${type}`, getBody(), true);
+      const name = document.getElementById("project_name").value.replace(/ /g,"_");
+      downloadBlob(blob, `${name}_cimentacion${ext}`);
+    } catch(e) { alert(e.message); }
+  }
+</script>
+</body>
+</html>

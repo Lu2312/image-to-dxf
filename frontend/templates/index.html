@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ArqGen — Generador de Planos NTC</title>
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
+  <a href="/cimentacion">Cimentación</a>
+  <a href="/planta">Planta</a>
+  <a href="/carpinteria">Carpintería</a>
+  <a href="/texto">Texto→DXF</a>
+  <a href="/imagen">Imagen→DXF</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="hero">
+  <span class="badge">NTC-RCDF Ciudad de México</span>
+  <h1>Genera planos técnicos<br>en <em>segundos</em></h1>
+  <p>
+    Ingresa los parámetros de tu proyecto y descarga DXF listo para AutoCAD,
+    PDF imprimible y catálogo de conceptos en Excel — bajo normativa NTC.
+  </p>
+</div>
+
+<div class="container">
+  <div class="cards">
+
+    <a class="card" href="/cimentacion">
+      <div class="card-icon">🏗️</div>
+      <h3>Cimentación</h3>
+      <p>
+        Planta de cimentación, cortes de zapatas corridas con armado,
+        tabla de acero y catálogo de conceptos (excavación, concreto, acero).
+      </p>
+      <div class="tags">
+        <span class="tag">DXF</span>
+        <span class="tag">PDF A1</span>
+        <span class="tag">Excel</span>
+        <span class="tag">NTC Cimentaciones</span>
+      </div>
+    </a>
+
+    <a class="card" href="/planta">
+      <div class="card-icon">📐</div>
+      <h3>Planta Arquitectónica</h3>
+      <p>
+        Configurador de planta tipo: define el lote y el programa, el sistema
+        distribuye los recintos y ubica castillos cada ≤4 m (NTC Mampostería).
+      </p>
+      <div class="tags">
+        <span class="tag">DXF</span>
+        <span class="tag">PDF A1</span>
+        <span class="tag">Excel</span>
+        <span class="tag">NTC Mampostería</span>
+      </div>
+    </a>
+
+    <a class="card" href="/carpinteria">
+      <div class="card-icon">🚪</div>
+      <h3>Carpintería / Cancelería</h3>
+      <p>
+        Alzados técnicos de ventanas, puertas y closets con cotas, despiece
+        de piezas y catálogo de materiales.
+      </p>
+      <div class="tags">
+        <span class="tag">DXF</span>
+        <span class="tag">PDF A3</span>
+        <span class="tag">Excel</span>
+        <span class="tag">Aluminio · Madera · PVC</span>
+      </div>
+    </a>
+
+    <a class="card" href="/texto">
+      <div class="card-icon">✏️</div>
+      <h3>Texto → DXF</h3>
+      <p>
+        Describe tu vivienda en español natural y ArqGen genera la planta
+        arquitectónica completa: "Casa de 3 recámaras, sala-comedor, cocina,
+        2 baños, lote 8×15 m".
+      </p>
+      <div class="tags">
+        <span class="tag">NL Parser</span>
+        <span class="tag">DXF</span>
+        <span class="tag">PDF</span>
+        <span class="tag">CONAVI</span>
+      </div>
+    </a>
+
+    <a class="card" href="/imagen">
+      <div class="card-icon">🖼️</div>
+      <h3>Imagen → DXF</h3>
+      <p>
+        Sube una imagen (PNG/JPG/BMP) y conviértela a entidades DXF:
+        contornos con LWPOLYLINE, rellenos HATCH o malla de píxeles.
+        Ideal para digitalizar croquis a mano.
+      </p>
+      <div class="tags">
+        <span class="tag">Trace</span>
+        <span class="tag">Hatch</span>
+        <span class="tag">Pixel</span>
+        <span class="tag">DXF R2010</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div style="margin-top:3rem; padding:1.5rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; max-width:700px; margin-left:auto; margin-right:auto;">
+    <h3 style="color:var(--accent2); margin-bottom:.75rem;">¿Cómo funciona?</h3>
+    <ol style="color:var(--muted); font-size:.9rem; line-height:1.8; padding-left:1.2rem;">
+      <li>Elige el módulo que necesitas (Cimentación, Planta o Carpintería).</li>
+      <li>Ingresa los parámetros del proyecto (ejes, dimensiones, materiales).</li>
+      <li>Haz clic en <strong style="color:var(--text)">Preview</strong> para ver el SVG en pantalla.</li>
+      <li>Descarga <strong style="color:var(--text)">DXF</strong>, <strong style="color:var(--text)">PDF</strong> o el <strong style="color:var(--text)">Catálogo Excel</strong>.</li>
+      <li>El sistema valida automáticamente el cumplimiento de las <strong style="color:var(--accent2)">NTC-RCDF</strong>.</li>
+    </ol>
+  </div>
+</div>
+
+<footer>
+  <strong>ArqGen</strong> — Generador paramétrico bajo NTC-RCDF &nbsp;|&nbsp;
+  Desarrollado con FastAPI + ezdxf &nbsp;|&nbsp;
+  <a href="/docs" style="color:var(--accent2)">API Docs</a>
+</footer>
+
+</body>
+</html>

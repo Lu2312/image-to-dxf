@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Planta — ArqGen</title>
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+  <style>
+    #recintos-list { display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem; }
+    .recinto-row { display:grid; grid-template-columns:1fr 80px 80px 28px; gap:.4rem; align-items:center; }
+    .recinto-row button { background:var(--border); border:none; color:var(--danger); border-radius:4px; cursor:pointer; font-size:1rem; height:32px; }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
+  <a href="/cimentacion">Cimentación</a>
+  <a href="/planta" class="active">Planta</a>
+  <a href="/carpinteria">Carpintería</a>
+  <a href="/texto">Texto→DXF</a>
+  <a href="/imagen">Imagen→DXF</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="container">
+  <h1 style="margin-bottom:1.5rem">📐 Planta Arquitectónica</h1>
+
+  <div class="tool-layout">
+
+    <!-- FORM -->
+    <div class="panel">
+      <h2>Parámetros del proyecto</h2>
+
+      <div class="form-group">
+        <label>Nombre del proyecto</label>
+        <input id="project_name" value="Casa Habitación"/>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ancho de lote (mm)</label>
+          <input id="lote_ancho" type="number" value="8000" min="3000"/>
+        </div>
+        <div class="form-group">
+          <label>Fondo de lote (mm)</label>
+          <input id="lote_fondo" type="number" value="15000" min="4000"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Espesor de muro (mm)</label>
+          <input id="espesor_muro" type="number" value="150" min="120" max="400"/>
+        </div>
+        <div class="form-group">
+          <label>Altura de muro (mm)</label>
+          <input id="altura_muro" type="number" value="2700" min="2200" max="4000"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Recintos
+          <button class="btn btn-success" style="padding:.2rem .6rem;font-size:.75rem;margin-left:.5rem" onclick="addRecinto()">+ Agregar</button>
+        </label>
+        <div id="recintos-list"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runPreview()">
+          <div class="spinner" id="sp-prev"></div>
+          ▶ Preview
+        </button>
+        <button class="btn btn-success" onclick="download('dxf')">⬇ DXF</button>
+        <button class="btn btn-success" onclick="download('pdf')">⬇ PDF</button>
+        <button class="btn btn-success" onclick="download('excel')">⬇ Excel</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-pane" id="preview-pane">
+      <div class="preview-tabs">
+        <button class="tab-btn active" data-tab="tab-svg">Vista previa</button>
+        <button class="tab-btn" data-tab="tab-cat">Catálogo</button>
+        <button class="tab-btn" data-tab="tab-ntc">NTC</button>
+      </div>
+      <div class="tab-content active" id="tab-svg">
+        <div id="svg-container" style="min-height:300px;display:flex;align-items:center;justify-content:center;color:var(--muted);">
+          Haz clic en <strong style="color:var(--text)">▶ Preview</strong> para ver el plano.
+        </div>
+      </div>
+      <div class="tab-content" id="tab-cat">
+        <div id="cat-container" style="color:var(--muted)">Sin datos.</div>
+      </div>
+      <div class="tab-content" id="tab-ntc">
+        <div id="ntc-container"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <strong>ArqGen</strong> — NTC-RCDF | Planta Arquitectónica | <a href="/docs" style="color:var(--accent2)">API Docs</a>
+</footer>
+
+<script src="/static/js/arqgen.js"></script>
+<script>
+  initTabs(document.getElementById("preview-pane"));
+
+  // Default recintos
+  const DEFAULT_RECINTOS = [
+    {nombre:"Sala",       ancho:3500, fondo:4000},
+    {nombre:"Comedor",    ancho:3000, fondo:3500},
+    {nombre:"Cocina",     ancho:3000, fondo:3000},
+    {nombre:"Recámara 1", ancho:3500, fondo:4000},
+    {nombre:"Recámara 2", ancho:3000, fondo:3500},
+    {nombre:"Baño",       ancho:2000, fondo:2500},
+  ];
+
+  DEFAULT_RECINTOS.forEach(r => addRecinto(r));
+
+  function addRecinto(data = {nombre:"Recinto", ancho:3000, fondo:3000}) {
+    const list = document.getElementById("recintos-list");
+    const row = document.createElement("div");
+    row.className = "recinto-row";
+    row.innerHTML = `
+      <input type="text" value="${data.nombre}" placeholder="Nombre"/>
+      <input type="number" value="${data.ancho}" min="1000" placeholder="Ancho mm"/>
+      <input type="number" value="${data.fondo}" min="1000" placeholder="Fondo mm"/>
+      <button onclick="this.parentElement.remove()">✕</button>`;
+    list.appendChild(row);
+  }
+
+  function getRecintos() {
+    return [...document.querySelectorAll(".recinto-row")].map(row => {
+      const [nombre, ancho, fondo] = row.querySelectorAll("input");
+      return {nombre: nombre.value, ancho: +ancho.value, fondo: +fondo.value};
+    });
+  }
+
+  function getBody() {
+    return {
+      project_name:  document.getElementById("project_name").value,
+      lote_ancho:   +document.getElementById("lote_ancho").value,
+      lote_fondo:   +document.getElementById("lote_fondo").value,
+      espesor_muro: +document.getElementById("espesor_muro").value,
+      altura_muro:  +document.getElementById("altura_muro").value,
+      recintos:      getRecintos(),
+    };
+  }
+
+  async function runPreview() {
+    const sp = document.getElementById("sp-prev");
+    sp.style.display = "inline-block";
+    try {
+      const data = await apiPost("/api/planta/preview", getBody());
+      document.getElementById("svg-container").innerHTML = data.svg;
+      renderNTC(document.getElementById("ntc-container"), data.ntc);
+      renderCatalog(document.getElementById("cat-container"), data.catalog);
+    } catch(e) {
+      document.getElementById("svg-container").innerHTML =
+        `<p style="color:var(--danger)">${e.message}</p>`;
+    } finally { sp.style.display = "none"; }
+  }
+
+  async function download(type) {
+    try {
+      const ext = { dxf: ".dxf", pdf: ".pdf", excel: ".xlsx" }[type];
+      const blob = await apiPost(`/api/planta/${type}`, getBody(), true);
+      const name = document.getElementById("project_name").value.replace(/ /g,"_");
+      downloadBlob(blob, `${name}_planta${ext}`);
+    } catch(e) { alert(e.message); }
+  }
+</script>
+</body>
+</html>

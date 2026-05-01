@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Imagen a DXF — ArqGen</title>
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+  <style>
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .drop-zone.drag-over, .drop-zone:hover {
+      border-color: var(--accent);
+      background: rgba(47,117,182,.08);
+    }
+    .drop-zone input[type=file] { display:none; }
+    #thumb-preview { max-width:100%; max-height:300px; border-radius:6px;
+                     margin-top:1rem; display:none; }
+    .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:.5rem;
+                 margin-top:.75rem; font-size:.85rem; }
+    .stat-item { background:var(--surface-alt); border-radius:4px; padding:.4rem .6rem; }
+    .stat-item span { color:var(--accent2); font-weight:600; }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
+  <a href="/cimentacion">Cimentación</a>
+  <a href="/planta">Planta</a>
+  <a href="/carpinteria">Carpintería</a>
+  <a href="/texto">Texto→DXF</a>
+  <a href="/imagen" class="active">Imagen→DXF</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="container">
+  <h1 style="margin-bottom:.5rem">🖼️ Imagen → DXF</h1>
+  <p style="color:var(--muted);margin-bottom:1.5rem">
+    Sube un croquis, plano o imagen cualquiera y conviértelo a entidades DXF
+    (LWPOLYLINE, HATCH o SOLID) listas para AutoCAD.
+  </p>
+
+  <div class="tool-layout">
+
+    <!-- FORM -->
+    <div class="panel">
+      <h2>Configuración</h2>
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(event)"/>
+        <div id="drop-label">
+          <div style="font-size:2.5rem;margin-bottom:.5rem">📂</div>
+          <strong>Haz clic o arrastra una imagen aquí</strong>
+          <p style="color:var(--muted);font-size:.85rem;margin-top:.3rem">PNG, JPG, BMP, TIFF — máx. 20 MB</p>
+        </div>
+        <img id="thumb-preview" alt="preview"/>
+      </div>
+
+      <div id="file-info" style="display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted)"></div>
+
+      <!-- Opciones -->
+      <div class="form-row" style="margin-top:1.25rem">
+        <div class="form-group">
+          <label>Modo de conversión</label>
+          <select id="mode">
+            <option value="trace" selected>Trace — contornos LWPOLYLINE</option>
+            <option value="hatch">Hatch — rellenos HATCH SOLID</option>
+            <option value="pixel">Pixel — SOLID por píxel (solo imágenes pequeñas)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Escala (mm/px)</label>
+          <input id="scale" type="number" value="0.1" min="0.01" max="100" step="0.01"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Umbral binarización (0–255)</label>
+          <input id="threshold" type="range" min="0" max="255" value="127"
+            oninput="document.getElementById('thr-val').textContent=this.value"/>
+          <small style="color:var(--muted)">Valor: <span id="thr-val">127</span></small>
+        </div>
+        <div class="form-group">
+          <label>Área mínima de contorno (px²)</label>
+          <input id="min_area" type="number" value="10" min="0" max="5000" step="1"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Simplificación D-P (epsilon, px)</label>
+          <input id="approx_epsilon" type="number" value="0.5" min="0" max="20" step="0.1"/>
+        </div>
+        <div class="form-group">
+          <label>Título del plano</label>
+          <input id="title" value="" placeholder="(opcional)"/>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:.5rem">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+          <input id="spline" type="checkbox" style="width:auto"/>
+          Usar SPLINE en vez de LWPOLYLINE (solo modo trace)
+        </label>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem">
+        <button class="btn-primary" onclick="doInfo()">🔍 Previsualizar estadísticas</button>
+        <button class="btn-secondary" id="btn-dl" onclick="doDownload()" style="display:none">⬇ Descargar DXF</button>
+      </div>
+
+      <!-- Estadísticas -->
+      <div id="stats-box" style="display:none;margin-top:1.5rem">
+        <h3 style="color:var(--accent2);font-size:.9rem;margin-bottom:.5rem">Resultado</h3>
+        <div id="stats-content" class="stat-grid"></div>
+      </div>
+    </div>
+
+    <!-- PREVIEW (imagen original escalada) -->
+    <div class="panel preview-panel">
+      <h2>Imagen original</h2>
+      <div id="img-area" style="width:100%;min-height:400px;display:flex;
+           align-items:center;justify-content:center;background:var(--surface-alt);
+           border-radius:6px;overflow:auto">
+        <span style="color:var(--muted);font-size:.9rem">La imagen seleccionada aparecerá aquí</span>
+      </div>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">
+        La vista previa DXF solo es visible al abrir el archivo en AutoCAD / LibreCAD / BricsCAD.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <strong>ArqGen</strong> — Generador paramétrico bajo NTC-RCDF &nbsp;|&nbsp;
+  <a href="/docs" style="color:var(--accent2)">API Docs</a>
+</footer>
+
+<script src="/static/js/arqgen.js"></script>
+<script>
+let selectedFile = null;
+
+// Drag & drop
+const dz = document.getElementById("drop-zone");
+dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag-over"); });
+dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+dz.addEventListener("drop", e => {
+  e.preventDefault(); dz.classList.remove("drag-over");
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith("image/")) loadFile(f);
+  else alert("Solo se aceptan archivos de imagen.");
+});
+
+function onFileSelected(evt) {
+  const f = evt.target.files[0];
+  if (f) loadFile(f);
+}
+
+function loadFile(f) {
+  selectedFile = f;
+  const url = URL.createObjectURL(f);
+  // Thumb
+  const thumb = document.getElementById("thumb-preview");
+  thumb.src = url; thumb.style.display = "block";
+  document.getElementById("drop-label").style.display = "none";
+  // Info
+  const info = document.getElementById("file-info");
+  info.textContent = `${f.name}  (${(f.size/1024).toFixed(1)} KB)`;
+  info.style.display = "block";
+  // Preview panel
+  const area = document.getElementById("img-area");
+  area.innerHTML = `<img src="${url}" style="max-width:100%;max-height:500px;border-radius:4px" alt="preview"/>`;
+  // Reset stats
+  document.getElementById("stats-box").style.display = "none";
+  document.getElementById("btn-dl").style.display = "none";
+}
+
+function buildFormData() {
+  const fd = new FormData();
+  fd.append("file",           selectedFile);
+  fd.append("mode",           document.getElementById("mode").value);
+  fd.append("scale",          document.getElementById("scale").value);
+  fd.append("threshold",      document.getElementById("threshold").value);
+  fd.append("min_area",       document.getElementById("min_area").value);
+  fd.append("approx_epsilon", document.getElementById("approx_epsilon").value);
+  fd.append("spline",         document.getElementById("spline").checked ? "true" : "false");
+  fd.append("title",          document.getElementById("title").value);
+  return fd;
+}
+
+async function doInfo() {
+  if (!selectedFile) { alert("Primero selecciona una imagen."); return; }
+  const fd = buildFormData();
+  try {
+    const res = await fetch("/api/imagen/info", { method: "POST", body: fd });
+    if (!res.ok) { const err = await res.json(); alert(err.detail || "Error"); return; }
+    const d = await res.json();
+    const grid = document.getElementById("stats-content");
+    grid.innerHTML = [
+      ["Modo",            d.mode],
+      ["Contornos",       d.contour_count],
+      ["Entidades DXF",   d.entity_count],
+      ["Imagen (px)",     `${d.img_width} × ${d.img_height}`],
+      ["Tamaño DXF (mm)", `${d.dxf_width_mm?.toFixed(1)} × ${d.dxf_height_mm?.toFixed(1)}`],
+    ].map(([k,v]) => `<div class="stat-item">${k}<br><span>${v}</span></div>`).join("");
+    document.getElementById("stats-box").style.display = "block";
+    document.getElementById("btn-dl").style.display = "inline-flex";
+  } catch(e) { alert("Error de conexión: " + e.message); }
+}
+
+async function doDownload() {
+  if (!selectedFile) return;
+  const fd = buildFormData();
+  try {
+    const res = await fetch("/api/imagen/dxf", { method: "POST", body: fd });
+    if (!res.ok) { const err = await res.json(); alert(err.detail || "Error"); return; }
+    const blob = await res.blob();
+    const stem = selectedFile.name.replace(/\.[^.]+$/,"");
+    const mode = document.getElementById("mode").value;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${stem}_${mode}.dxf`;
+    a.click();
+  } catch(e) { alert("Error: " + e.message); }
+}
+</script>
+</body>
+</html>

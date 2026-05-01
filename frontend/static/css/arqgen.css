@@ -1,0 +1,226 @@
+/* arqgen.css — Design system */
+:root {
+  --bg:       #0d1117;
+  --surface:  #161b22;
+  --border:   #30363d;
+  --accent:   #2E75B6;
+  --accent2:  #58a6ff;
+  --success:  #3fb950;
+  --warn:     #d29922;
+  --danger:   #f85149;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --radius:   8px;
+  --font:     "Segoe UI", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+}
+
+/* ---- NAV ---- */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent2);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+.nav-brand span { color: var(--muted); font-weight: 400; }
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .9rem;
+  padding: .25rem .5rem;
+  border-radius: 4px;
+  transition: color .15s, background .15s;
+}
+nav a:hover, nav a.active { color: var(--text); background: var(--border); }
+
+/* ---- LAYOUT ---- */
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+.hero {
+  text-align: center;
+  padding: 4rem 1rem 3rem;
+}
+.hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: .75rem; }
+.hero h1 em { color: var(--accent2); font-style: normal; }
+.hero p { color: var(--muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem; }
+
+.badge {
+  display: inline-block;
+  background: #1a2f4a;
+  color: var(--accent2);
+  font-size: .75rem;
+  padding: .2rem .6rem;
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  margin-bottom: 1rem;
+}
+
+/* ---- CARDS ---- */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: border-color .2s, transform .2s;
+  text-decoration: none;
+  color: var(--text);
+  display: block;
+}
+.card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+.card-icon { font-size: 2rem; margin-bottom: .75rem; }
+.card h3 { font-size: 1.1rem; margin-bottom: .4rem; }
+.card p { color: var(--muted); font-size: .875rem; line-height: 1.5; }
+.card .tags { margin-top: .75rem; display: flex; gap: .4rem; flex-wrap: wrap; }
+.tag {
+  font-size: .7rem;
+  background: #1a2a1a;
+  color: var(--success);
+  padding: .15rem .45rem;
+  border-radius: 4px;
+  border: 1px solid #2a4a2a;
+}
+
+/* ---- TOOL PAGE ---- */
+.tool-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .tool-layout { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+.panel h2 { font-size: 1.1rem; margin-bottom: 1.25rem; color: var(--accent2); border-bottom: 1px solid var(--border); padding-bottom: .6rem; }
+
+/* ---- FORM ---- */
+.form-group { margin-bottom: 1rem; }
+label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: .3rem; }
+input, select, textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: .45rem .7rem;
+  font-size: .9rem;
+  font-family: var(--font);
+  transition: border-color .15s;
+}
+input:focus, select:focus { outline: none; border-color: var(--accent2); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+/* ---- BUTTONS ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem 1.1rem;
+  border-radius: 6px;
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity .15s, transform .1s;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { opacity: .88; }
+.btn-success { background: #1a4a1a; color: var(--success); border: 1px solid #2a6a2a; }
+.btn-success:hover { background: #1f5a1f; }
+.btn-row { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
+
+/* ---- PREVIEW PANE ---- */
+.preview-pane {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.preview-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.tab-btn {
+  padding: .6rem 1.1rem;
+  font-size: .85rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--muted);
+  transition: color .15s, background .15s;
+  border-bottom: 2px solid transparent;
+}
+.tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+.tab-content { padding: 1rem; display: none; }
+.tab-content.active { display: block; }
+
+#svg-container svg { width: 100%; height: auto; border-radius: 4px; }
+
+/* ---- TABLE ---- */
+.catalog-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.catalog-table th {
+  background: #1a2f4a;
+  color: var(--accent2);
+  padding: .45rem .6rem;
+  text-align: left;
+  font-weight: 600;
+}
+.catalog-table td { padding: .4rem .6rem; border-bottom: 1px solid var(--border); }
+.catalog-table tr:nth-child(even) td { background: #11161c; }
+
+/* ---- NTC ALERTS ---- */
+.ntc-ok    { color: var(--success); font-size: .85rem; }
+.ntc-warn  { color: var(--warn);    font-size: .85rem; }
+.ntc-error { color: var(--danger);  font-size: .85rem; }
+.ntc-box { margin-top: .5rem; padding: .6rem .8rem; border-radius: 6px; }
+.ntc-box.ok    { background: #0d2a0d; border: 1px solid #1a4a1a; }
+.ntc-box.warn  { background: #2a1a00; border: 1px solid #4a3a00; }
+.ntc-box.error { background: #2a0d0d; border: 1px solid #4a1a1a; }
+
+/* ---- SPINNER ---- */
+.spinner {
+  display: none;
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent2);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- FOOTER ---- */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: .8rem;
+  margin-top: 4rem;
+}
+footer strong { color: var(--accent2); }

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Texto a DXF — ArqGen</title>
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
+  <a href="/cimentacion">Cimentación</a>
+  <a href="/planta">Planta</a>
+  <a href="/carpinteria">Carpintería</a>
+  <a href="/texto" class="active">Texto→DXF</a>
+  <a href="/imagen">Imagen→DXF</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="container">
+  <h1 style="margin-bottom:.5rem">✏️ Texto → DXF</h1>
+  <p style="color:var(--muted);margin-bottom:1.5rem">
+    Describe tu vivienda en español. ArqGen analiza el texto y genera la planta
+    arquitectónica completa con validación CONAVI/NTC-RCDF.
+  </p>
+
+  <div class="tool-layout">
+
+    <!-- FORM -->
+    <div class="panel">
+      <h2>Descripción del proyecto</h2>
+
+      <div class="form-group">
+        <label>Nombre del proyecto</label>
+        <input id="project_name" value="Vivienda Tipo A"/>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción en lenguaje natural</label>
+        <textarea id="texto" rows="7" style="width:100%;resize:vertical;padding:.6rem;
+          background:var(--surface-alt);color:var(--text);border:1px solid var(--border);
+          border-radius:4px;font-size:.9rem"
+          placeholder="Ej: Casa de 3 recámaras, sala-comedor, cocina, 2 baños, patio de servicio y cochera. Lote de 8 x 15 m. Muro de 15 cm, altura 2.7 m.">Casa de 3 recámaras, sala-comedor, cocina, 2 baños, patio de servicio y cochera. Lote de 8 x 15 m.</textarea>
+      </div>
+
+      <p style="font-size:.8rem;color:var(--muted);margin-top:-.5rem;margin-bottom:1rem">
+        <strong style="color:var(--text)">Puedes incluir:</strong> número de recámaras/baños, dimensiones del lote (NxM m),
+        altura de muro, materiales. El parser extrae automáticamente el programa arquitectónico.
+      </p>
+
+      <button class="btn-primary" onclick="doPreview()">🔍 Analizar y previsualizar</button>
+
+      <div id="btns-dl" style="display:none;margin-top:1rem;display:flex;flex-wrap:wrap;gap:.5rem">
+        <button class="btn-secondary" onclick="doDl('dxf')">⬇ DXF</button>
+        <button class="btn-secondary" onclick="doDl('pdf')">⬇ PDF</button>
+        <button class="btn-secondary" onclick="doDl('excel')">⬇ Excel</button>
+      </div>
+
+      <!-- Programa detectado -->
+      <div id="programa-box" style="display:none;margin-top:1.5rem">
+        <h3 style="color:var(--accent2);font-size:.9rem;margin-bottom:.5rem">Programa detectado</h3>
+        <ul id="programa-list" style="list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:.4rem"></ul>
+        <p id="lote-info" style="font-size:.85rem;color:var(--muted);margin-top:.5rem"></p>
+      </div>
+
+      <!-- Notas del parser -->
+      <div id="notas-box" style="display:none;margin-top:1rem;padding:.75rem;
+           background:#1a1200;border:1px solid #5a4800;border-radius:6px">
+        <strong style="color:#f0b429;font-size:.85rem">⚠ Notas del parser</strong>
+        <ul id="notas-list" style="margin:.4rem 0 0;padding-left:1.2rem;font-size:.82rem;color:#d4a700"></ul>
+      </div>
+
+      <!-- NTC -->
+      <div id="ntc-box" style="display:none;margin-top:1.5rem">
+        <h3 style="color:var(--accent2);font-size:.9rem;margin-bottom:.5rem">Validación NTC-RCDF / CONAVI</h3>
+        <div id="ntc-content"></div>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="panel preview-panel">
+      <h2>Planta generada</h2>
+      <div id="preview-area" style="width:100%;min-height:400px;display:flex;
+           align-items:center;justify-content:center;background:var(--surface-alt);
+           border-radius:6px;overflow:auto">
+        <span style="color:var(--muted);font-size:.9rem">El plano aparecerá aquí</span>
+      </div>
+
+      <!-- Catálogo -->
+      <div id="catalog-box" style="display:none;margin-top:1.5rem">
+        <h3 style="color:var(--accent2);font-size:.9rem;margin-bottom:.5rem">Catálogo de conceptos</h3>
+        <div id="catalog-content" style="overflow-x:auto"></div>
+      </div>
+    </div>
+
+  </div><!-- /.tool-layout -->
+</div><!-- /.container -->
+
+<footer>
+  <strong>ArqGen</strong> — Generador paramétrico bajo NTC-RCDF &nbsp;|&nbsp;
+  <a href="/docs" style="color:var(--accent2)">API Docs</a>
+</footer>
+
+<script src="/static/js/arqgen.js"></script>
+<script>
+function payload() {
+  return {
+    texto:        document.getElementById("texto").value.trim(),
+    project_name: document.getElementById("project_name").value.trim() || "Proyecto ArqGen",
+  };
+}
+
+async function doPreview() {
+  const data = payload();
+  if (data.texto.length < 10) {
+    alert("Escribe al menos una descripción de 10 caracteres.");
+    return;
+  }
+  const res = await apiPost("/api/texto/preview", data);
+  if (!res) return;
+
+  // SVG
+  const area = document.getElementById("preview-area");
+  if (res.svg) {
+    area.innerHTML = res.svg;
+    area.firstElementChild && (area.firstElementChild.style.maxWidth = "100%");
+  }
+
+  // Programa
+  const progBox  = document.getElementById("programa-box");
+  const progList = document.getElementById("programa-list");
+  progList.innerHTML = (res.programa || []).map(r =>
+    `<li style="background:var(--accent);color:#fff;padding:.2rem .6rem;border-radius:12px;font-size:.8rem">${r}</li>`
+  ).join("");
+  const lote = res.lote || {};
+  document.getElementById("lote-info").textContent =
+    `Lote: ${lote.ancho_m ?? "?"}m × ${lote.fondo_m ?? "?"}m`;
+  progBox.style.display = "block";
+
+  // Notas del parser
+  const notas = res.notas || [];
+  const notasBox = document.getElementById("notas-box");
+  if (notas.length) {
+    document.getElementById("notas-list").innerHTML =
+      notas.map(n => `<li>${n}</li>`).join("");
+    notasBox.style.display = "block";
+  } else {
+    notasBox.style.display = "none";
+  }
+
+  // NTC
+  renderNTC(res.ntc, "ntc-content");
+  document.getElementById("ntc-box").style.display = "block";
+
+  // Catálogo
+  renderCatalog(res.catalog, "catalog-content");
+  document.getElementById("catalog-box").style.display = "block";
+
+  // Botones descarga
+  document.getElementById("btns-dl").style.display = "flex";
+}
+
+async function doDl(fmt) {
+  const data = payload();
+  const mimes = { dxf:"application/dxf", pdf:"application/pdf",
+    excel:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
+  const exts  = { dxf:".dxf", pdf:".pdf", excel:".xlsx" };
+  const name  = (data.project_name || "planta_texto").replace(/ /g,"_");
+  await downloadBlob(`/api/texto/${fmt}`, data, name + exts[fmt], mimes[fmt]);
+}
+</script>
+</body>
+</html>

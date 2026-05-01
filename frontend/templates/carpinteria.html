@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Carpintería — ArqGen</title>
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
+  <a href="/cimentacion">Cimentación</a>
+  <a href="/planta">Planta</a>
+  <a href="/carpinteria" class="active">Carpintería</a>
+  <a href="/texto">Texto→DXF</a>
+  <a href="/imagen">Imagen→DXF</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="container">
+  <h1 style="margin-bottom:1.5rem">🚪 Carpintería / Cancelería</h1>
+
+  <div class="tool-layout">
+
+    <!-- FORM -->
+    <div class="panel">
+      <h2>Parámetros del elemento</h2>
+
+      <div class="form-group">
+        <label>Nombre del proyecto</label>
+        <input id="project_name" value="Vivienda Tipo A"/>
+      </div>
+
+      <div class="form-group">
+        <label>Tipo de elemento</label>
+        <select id="tipo">
+          <option value="ventana_fija">Ventana fija</option>
+          <option value="ventana_corrediza">Ventana corrediza</option>
+          <option value="puerta" selected>Puerta</option>
+          <option value="closet">Closet (puertas corredizas)</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ancho (mm)</label>
+          <input id="ancho" type="number" value="900" min="400" max="6000"/>
+        </div>
+        <div class="form-group">
+          <label>Alto (mm)</label>
+          <input id="alto" type="number" value="2100" min="600" max="3000"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ancho de marco (mm)</label>
+          <input id="marco_ancho" type="number" value="50" min="30" max="150"/>
+        </div>
+        <div class="form-group">
+          <label>Grosor de hoja (mm)</label>
+          <input id="hoja_grosor" type="number" value="40" min="20" max="100"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Número de hojas</label>
+          <input id="n_hojas" type="number" value="1" min="1" max="6"/>
+        </div>
+        <div class="form-group">
+          <label>Material</label>
+          <select id="material">
+            <option value="aluminio" selected>Aluminio</option>
+            <option value="madera">Madera</option>
+            <option value="pvc">PVC</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Acabado</label>
+        <input id="acabado" value="natural"/>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runPreview()">
+          <div class="spinner" id="sp-prev"></div>
+          ▶ Preview
+        </button>
+        <button class="btn btn-success" onclick="download('dxf')">⬇ DXF</button>
+        <button class="btn btn-success" onclick="download('pdf')">⬇ PDF</button>
+        <button class="btn btn-success" onclick="download('excel')">⬇ Excel</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-pane" id="preview-pane">
+      <div class="preview-tabs">
+        <button class="tab-btn active" data-tab="tab-svg">Vista previa</button>
+        <button class="tab-btn" data-tab="tab-cat">Catálogo</button>
+      </div>
+      <div class="tab-content active" id="tab-svg">
+        <div id="svg-container" style="min-height:300px;display:flex;align-items:center;justify-content:center;color:var(--muted);">
+          Haz clic en <strong style="color:var(--text)">▶ Preview</strong> para ver el detalle.
+        </div>
+      </div>
+      <div class="tab-content" id="tab-cat">
+        <div id="cat-container" style="color:var(--muted)">Sin datos.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <strong>ArqGen</strong> — NTC-RCDF | Carpintería | <a href="/docs" style="color:var(--accent2)">API Docs</a>
+</footer>
+
+<script src="/static/js/arqgen.js"></script>
+<script>
+  initTabs(document.getElementById("preview-pane"));
+
+  function getBody() {
+    return {
+      project_name: document.getElementById("project_name").value,
+      tipo:         document.getElementById("tipo").value,
+      ancho:       +document.getElementById("ancho").value,
+      alto:        +document.getElementById("alto").value,
+      marco_ancho: +document.getElementById("marco_ancho").value,
+      hoja_grosor: +document.getElementById("hoja_grosor").value,
+      n_hojas:     +document.getElementById("n_hojas").value,
+      material:     document.getElementById("material").value,
+      acabado:      document.getElementById("acabado").value,
+    };
+  }
+
+  async function runPreview() {
+    const sp = document.getElementById("sp-prev");
+    sp.style.display = "inline-block";
+    try {
+      const data = await apiPost("/api/carpinteria/preview", getBody());
+      document.getElementById("svg-container").innerHTML = data.svg;
+      renderCatalog(document.getElementById("cat-container"), data.catalog);
+    } catch(e) {
+      document.getElementById("svg-container").innerHTML =
+        `<p style="color:var(--danger)">${e.message}</p>`;
+    } finally { sp.style.display = "none"; }
+  }
+
+  async function download(type) {
+    try {
+      const ext = { dxf: ".dxf", pdf: ".pdf", excel: ".xlsx" }[type];
+      const blob = await apiPost(`/api/carpinteria/${type}`, getBody(), true);
+      const name = document.getElementById("project_name").value.replace(/ /g,"_");
+      const tipo = document.getElementById("tipo").value;
+      downloadBlob(blob, `${name}_${tipo}${ext}`);
+    } catch(e) { alert(e.message); }
+  }
+</script>
+</body>
+</html>
