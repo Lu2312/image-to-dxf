@@ -1,201 +1,358 @@
-# image-to-dxf=4.8.0
+# ArqGen — Generador Paramétrico de Planos Arquitectónicos
 
-High-quality image-to-DXF converter optimised for AutoCAD.
+SaaS para generación automática de planos arquitectónicos y estructurales en DXF bajo las **Normas Técnicas Complementarias del RCDF** (Ciudad de México).
 
-## Features
+**Demo en producción:** http://159.89.157.63:8080  
+**API interactiva:** http://159.89.157.63:8080/docs
 
-| Feature | Detail |
+## Módulos
+
+| Módulo | Descripción |
 |---|---|
-| **3 conversion modes** | `trace`, `hatch`, `pixel` |
-| **AutoCAD-ready DXF** | AC1015 (AutoCAD 2000+), mm units, named layers |
-| **Contour tracing** | OpenCV `findContours` + optional Douglas-Peucker simplification |
-| **Smooth curves** | Optional SPLINE entities (cubic B-spline) |
-| **Solid fills** | HATCH entities with SOLID pattern |
-| **Metadata block** | Title, source file, dimensions and date written to an INFO layer |
-| **GUI** | Resizable Tkinter app with live image preview and DXF preview |
-| **CLI** | Full command-line interface with stats output |
+| **Planta Arquitectónica** | Planta tipo, alzado frontal y corte A-A' con validación NTC-RCDF |
+| **Cimentación** | Zapatas corridas, zapatas aisladas con armado y catálogo de conceptos |
+| **Carpintería / Cancelería** | Detalles de ventanas, puertas y closets con despiece |
+| **Imagen a DXF** | Conversión de imágenes (PNG/JPG) a entidades DXF vectoriales |
+| **Texto a DXF** | Descripción en lenguaje natural → planta arquitectónica completa |
+
+## Salidas por módulo
+
+Todos los módulos de arquitectura generan:
+- Archivo **DXF** (AC1024 / AutoCAD 2010+, unidades mm)
+- Archivo **PDF** (render del plano)
+- Archivo **Excel** con catálogo de conceptos y cantidades
+- **Vista previa SVG** en el navegador
+- **Reporte NTC** con validaciones y observaciones
 
 ## Conversion modes
 
-| Mode | What it produces | Best for |
-|---|---|---|
-| `trace` | LWPOLYLINE (or SPLINE) outlines | Line art, logos, signatures |
-| `hatch` | Outlined + solid-filled HATCH shapes | Silhouettes, filled logos |
-| `pixel` | One SOLID square per dark pixel | Pixel art, small rasters |
-
-## Installation
+## Instalación
 
 ```bash
+git clone https://github.com/Lu2312/image-to-dxf.git
+cd image-to-dxf
 pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
-### Requirements
+La app queda disponible en `http://127.0.0.1:8000`.
 
-| Package | Minimum version |
+### Dependencias
+
+| Paquete | Versión mínima | Uso |
+|---|---|---|
+| `fastapi` | 0.110.0 | Framework API REST |
+| `uvicorn` | 0.29.0 | Servidor ASGI |
+| `pydantic` | 2.0.0 | Validación de parámetros |
+| `ezdxf` | 1.1.0 | Generación de archivos DXF |
+| `Pillow` | 10.0.0 | Renderizado de imágenes / PDF |
+| `numpy` | 1.24.0 | Operaciones matriciales |
+| `matplotlib` | 3.7.0 | Generación de PDFs |
+| `openpyxl` | 3.1.0 | Generación de Excel |
+| `opencv-python` | 4.8.0 | Trazado de contornos (módulo imagen) |
+
+---
+
+## Módulo 1 — Planta Arquitectónica
+
+Genera planta tipo de vivienda de interés social con alzado frontal y corte transversal.
+
+**Endpoint:** `POST /api/planta/{dxf|pdf|excel|preview|validate}`
+
+### Parámetros
+
+| Campo | Tipo | Default | Descripción |
+|---|---|---|---|
+| `lote_ancho` | float (mm) | 6000 | Ancho del lote |
+| `lote_fondo` | float (mm) | 12000 | Fondo del lote |
+| `espesor_muro` | float (mm) | 150 | Espesor de muros portantes |
+| `altura_muro` | float (mm) | 2700 | Altura libre del nivel |
+| `recintos` | lista | — | Cada recinto: `nombre`, `ancho`, `fondo` |
+| `project_name` | string | "Proyecto" | Nombre del proyecto |
+
+### Recintos disponibles
+
+`SALA`, `COMEDOR`, `SALA_COMEDOR`, `COCINA`, `RECAMARA`, `BANO`, `BANO_MEDIO`, `ESTUDIO`, `PATIO`, `PASILLO`, `GARAGE`, `LAVANDERIA`, `BODEGA`
+
+### Capas DXF generadas
+
+| Capa | Color | Grosor | Contenido |
+|---|---|---|---|
+| `A-EJE` | Rojo | 0.18mm | Ejes de trazo (linetype CENTER) |
+| `A-MURO` | Blanco | 0.30mm | Muros portantes en corte |
+| `A-COTA` | Amarillo | 0.18mm | Dimensiones y cotas |
+| `A-PUERTA` | Verde | 0.18mm | Umbral + arco de batiente 90° |
+| `A-VENTANA` | Cian | 0.18mm | Triple línea paralela en muro |
+| `A-CORTADO` | Blanco | 0.50mm | Elementos en corte (alzado/sección) |
+| `A-PROYECTADO` | Gris | 0.09mm | Elementos proyectados |
+| `E-CASTILLO` | Magenta | 0.18mm | Castillos sugeridos por NTC |
+
+### Estándares CAD implementados
+
+- Malla de ejes primero (sobresalen 1000mm del edificio), muros desfasados del eje
+- Globos de eje: verticales 1,2,3… / horizontales A,B,C…
+- Entidades `DIMENSION` reales de AutoCAD (no líneas sueltas)
+- Alzado frontal con niveles NPT±0.00, cerramiento y losa
+- Corte A-A' con elementos cortados vs. proyectados diferenciados por grosor
+- Validación SEDATU: paso mínimo ≥ 900mm entre muros
+
+### Validación NTC-RCDF incluida
+
+- Área mínima CONAVI / INFONAVIT (42 m²)
+- Altura libre mínima RCDF: 2,300mm
+- Separación máxima entre castillos: 4.0m (NTC Mampostería 2017)
+- Dimensiones mínimas de castillos: sección 150×150mm
+- Recubrimientos mínimos de concreto según NTC 2017
+
+### Ejemplo de request
+
+```json
+POST /api/planta/dxf
+{
+  "lote_ancho": 6000,
+  "lote_fondo": 12000,
+  "espesor_muro": 150,
+  "altura_muro": 2700,
+  "project_name": "Casa tipo A",
+  "recintos": [
+    {"nombre": "SALA",     "ancho": 3500, "fondo": 4000},
+    {"nombre": "COCINA",   "ancho": 2500, "fondo": 3000},
+    {"nombre": "RECAMARA", "ancho": 3500, "fondo": 4000},
+    {"nombre": "BANO",     "ancho": 1800, "fondo": 2500}
+  ]
+}
+```
+
+---
+
+## Módulo 2 — Cimentación
+
+Genera expediente técnico de cimentación: planta, cortes con armado y catálogo.
+
+**Endpoint:** `POST /api/cimentacion/{dxf|pdf|excel|preview|validate}`
+
+### Parámetros
+
+| Campo | Tipo | Default | Descripción |
+|---|---|---|---|
+| `ejes_x` | lista float (mm) | — | Posiciones de ejes verticales |
+| `ejes_y` | lista float (mm) | — | Posiciones de ejes horizontales |
+| `espesor_muro` | float (mm) | 150 | Espesor de muros |
+| `ancho_zapata` | float (mm) | 500 | Ancho de zapata corrida |
+| `alto_zapata` | float (mm) | 350 | Peralte de zapata corrida |
+| `desplante` | float (mm) | 600 | Profundidad de desplante |
+| `varilla_long` | string | "No.4" | Varilla longitudinal |
+| `varilla_trans` | string | "No.4" | Varilla transversal |
+| `sep_long_mm` | float (mm) | 200 | Separación varilla longitudinal |
+| `fc` | float (kg/cm²) | 200 | Resistencia del concreto |
+| `fy` | float (kg/cm²) | 4200 | Límite de fluencia del acero |
+
+### Contenido del DXF
+
+- Planta de cimentación con zapatas corridas bajo muros y zapatas aisladas en columnas
+- Corte de zapata corrida con representación de armado, achurado de tierra y concreto
+- Corte de zapata aislada con armado
+- Tabla de armados en capa `T-TEXTO`
+- Catálogo de conceptos: concreto, acero, excavación, plantilla
+
+---
+
+## Módulo 3 — Carpintería y Cancelería
+
+Genera detalles técnicos de ventanas, puertas y closets con despiece de piezas.
+
+**Endpoint:** `POST /api/carpinteria/{dxf|pdf|excel|preview}`
+
+### Tipos soportados
+
+| Tipo | Descripción |
 |---|---|
-| `opencv-python` | 4.8.0 |
-| `ezdxf` | 1.1.0 |
-| `Pillow` | 10.0.0 |
-| `numpy` | 1.24.0 |
-| `matplotlib` | 3.7.0 |
+| `ventana_fija` | Ventana fija con marco y cristal |
+| `ventana_corrediza` | Ventana con hojas corredizas |
+| `puerta` | Puerta interior o exterior con umbral |
+| `closet` | Mueble de closet con puertas batientes o corredizas |
 
-## Quick start
+### Parámetros
 
-### GUI
+| Campo | Tipo | Default | Descripción |
+|---|---|---|---|
+| `tipo` | string | — | Tipo de elemento (ver tabla arriba) |
+| `ancho` | float (mm) | — | Ancho del vano libre |
+| `alto` | float (mm) | — | Alto del vano libre |
+| `marco_ancho` | float (mm) | 50 | Perfil del marco |
+| `hoja_grosor` | float (mm) | 40 | Grosor de hoja / perfil |
+| `n_hojas` | int | 2 | Número de hojas |
+| `material` | string | "aluminio" | `aluminio` / `madera` / `pvc` |
 
-```bash
-python gui.py
-```
+---
 
-1. Click **Browse…** next to *Input image* and select a PNG / JPG / BMP / TIFF.
-2. The thumbnail appears immediately in the **Original image** tab on the right.
-3. Adjust options (mode, scale, threshold, …) as needed.
-4. Optionally type a **Drawing title** – it will be embedded in the DXF INFO layer.
-5. Click **⚙ Convert to DXF**.
-6. After conversion the **DXF preview** tab shows a rendered view of all entities.
-7. Conversion statistics (contours, entities, drawing size) appear in the left panel.
+## Módulo 4 — Imagen a DXF
 
-### CLI
+Convierte imágenes rasterizadas a entidades DXF vectoriales usando detección de contornos con OpenCV.
 
-```bash
-python image_to_dxf.py input.png
-python image_to_dxf.py input.png -o output.dxf -m hatch -s 0.25
-```
+**Endpoint:** `POST /api/imagen/{dxf|preview}`
 
-Sample output:
+### Modos de conversión
 
-```
-DXF saved to: output.dxf
-  Contours : 14
-  Entities : 31
-  Size     : 128.0 x 64.0 mm
-```
-
-### Python API
-
-```python
-from image_to_dxf import convert
-
-result = convert(
-    "logo.png",
-    "logo.dxf",
-    mode="hatch",       # "trace" | "hatch" | "pixel"
-    scale=0.25,         # mm per pixel
-    threshold=127,      # greyscale binarisation threshold (0-255)
-    min_area=10.0,      # discard contours smaller than this (px²)
-    approx_epsilon=0.5, # Douglas-Peucker simplification (px); 0 = off
-    lineweight=25,      # 1/100 mm
-    title="My Logo",    # written to the INFO layer
-)
-
-print(result.path)           # pathlib.Path to the saved DXF
-print(result.contour_count)  # number of contours found
-print(result.entity_count)   # number of DXF entities written
-print(result.dxf_width)      # drawing width in mm
-print(result.dxf_height)     # drawing height in mm
-```
-
-## CLI reference
-
-```
-usage: image_to_dxf.py [-h] [-o OUTPUT] [-m {trace,hatch,pixel}]
-                        [-s SCALE] [-t THRESHOLD]
-                        [--min-area MIN_AREA] [--epsilon EPSILON]
-                        [--spline] [--lineweight LINEWEIGHT]
-                        [--layer-contour LAYER_CONTOUR]
-                        [--layer-hatch LAYER_HATCH]
-                        input
-
-positional arguments:
-  input                      Source image path
-
-options:
-  -o, --output OUTPUT        Output DXF path (default: same dir/name as input)
-  -m, --mode {trace,hatch,pixel}
-                             Conversion mode (default: trace)
-  -s, --scale SCALE          mm per pixel (default: 0.1)
-  -t, --threshold THRESHOLD  Greyscale threshold 0-255 (default: 127)
-  --min-area MIN_AREA        Minimum contour area in px² (default: 10)
-  --epsilon EPSILON          Douglas-Peucker simplification in px (default: 0.5)
-  --spline                   Use SPLINE entities instead of LWPOLYLINE
-  --lineweight LINEWEIGHT    Lineweight in 1/100 mm (default: 25)
-  --layer-contour NAME       Layer name for contour entities (default: CONTOURS)
-  --layer-hatch NAME         Layer name for hatch entities (default: HATCHES)
-```
-
-## DXF layer structure
-
-| Layer | Content | Default ACI colour |
+| Modo | Entidades generadas | Ideal para |
 |---|---|---|
-| `CONTOURS` | Traced polylines / splines | 7 (white/black) |
-| `HATCHES` | Solid hatch fills | 2 (yellow) |
-| `PIXELS` | Pixel-mode SOLID squares | 3 (green) |
-| `INFO` | Title block text and separator line | 8 (dark grey) |
+| `trace` | `LWPOLYLINE` / `SPLINE` | Arte lineal, logos, firmas |
+| `hatch` | `LWPOLYLINE` + `HATCH SOLID` | Siluetas, logos rellenos |
+| `pixel` | `SOLID` (un cuadro por píxel) | Pixel art, imágenes pequeñas |
 
-## Running the tests
+### Parámetros
 
-```bash
-pip install pytest
-pytest test_image_to_dxf.py -v
-```
+| Campo | Tipo | Default | Descripción |
+|---|---|---|---|
+| `mode` | string | `trace` | Modo de conversión |
+| `scale` | float | 0.1 | mm por píxel |
+| `threshold` | int (0-255) | 127 | Umbral de binarización |
+| `min_area` | float (px²) | 10.0 | Área mínima de contorno |
+| `approx_epsilon` | float | 0.5 | Simplificación Douglas-Peucker |
+| `spline` | bool | false | Usar `SPLINE` en vez de `LWPOLYLINE` |
+| `lineweight` | int | 25 | Grosor de línea (1/100 mm) |
 
-## Project structure
+### Capas DXF generadas
 
-```
-image-to-dxf/
-├── image_to_dxf.py      # Core converter library + CLI entry-point
-├── gui.py               # Tkinter GUI with image & DXF preview
-├── test_image_to_dxf.py # pytest test suite
-├── requirements.txt     # Python dependencies
-└── README.md
-```
+| Capa | Contenido |
+|---|---|
+| `CONTORNOS` | Polilíneas / splines trazados |
+| `RELLENOS` | Rellenos sólidos (modo hatch) |
+| `PIXELES` | Cuadros sólidos (modo pixel) |
+| `INFO` | Bloque de título con metadatos |
 
+---
 
-## GUI usage
+## Módulo 5 — Texto a DXF
 
-```bash
-python gui.py
-```
+Genera una planta arquitectónica completa a partir de una descripción en lenguaje natural en español.
 
-1. Click **Browse…** to select your image (PNG, JPG, BMP, TIFF, …).
-2. Choose an output path (auto-filled from the input name).
-3. Adjust options if needed.
-4. Click **Convert**.
+**Endpoint:** `POST /api/texto/{dxf|pdf|excel|preview|validate}`
 
-## CLI usage
+### Cómo funciona
 
-```bash
-python image_to_dxf.py input.png
-python image_to_dxf.py input.png -o output.dxf -m hatch -s 0.2
-python image_to_dxf.py logo.png --spline --epsilon 1.0
-```
+1. El usuario escribe una descripción libre: _"casa de 3 recamaras, sala-comedor, cocina, 2 baños, lote 8x15"_
+2. El parser extrae dimensiones del lote, programa arquitectónico, número de plantas y material
+3. Construye `PlantaParams` y delega al `PlantaGenerator`
+4. Devuelve los mismos outputs que el módulo de Planta
 
-### All CLI flags
+### Palabras clave reconocidas (español flexible)
 
-| Flag | Default | Description |
+| Recinto | Variantes |
+|---|---|
+| Sala | sala, estar, living |
+| Comedor | comedor, dining |
+| Cocina | cocina, kitchen, cocineta |
+| Recámara | recamara, habitacion, cuarto, dormitorio, bedroom |
+| Baño | baño, wc, sanitario, toilet, bathroom |
+| Garage | garage, garaje, cochera, estacionamiento |
+| Lavandería | lavandería, patio servicio, cuarto lavado |
+
+---
+
+## API REST completa
+
+| Método | Ruta | Descripción |
 |---|---|---|
-| `-o / --output` | same name as input | Output `.dxf` path |
-| `-m / --mode` | `trace` | `trace` / `hatch` / `pixel` |
-| `-s / --scale` | `0.1` | mm per pixel |
-| `-t / --threshold` | `127` | Greyscale threshold (0-255) |
-| `--min-area` | `10` | Minimum contour area (px²) |
-| `--epsilon` | `0.5` | Douglas-Peucker simplification (px); `0` = off |
-| `--spline` | off | Use SPLINE entities (trace mode) |
-| `--lineweight` | `25` | Lineweight in 1/100 mm |
-| `--layer-contour` | `CONTOURS` | Layer name for outlines |
-| `--layer-hatch` | `HATCHES` | Layer name for fills |
+| GET | `/` | Página principal |
+| GET | `/planta` | UI — Planta arquitectónica |
+| GET | `/cimentacion` | UI — Cimentación |
+| GET | `/carpinteria` | UI — Carpintería |
+| GET | `/texto` | UI — Texto a DXF |
+| GET | `/imagen` | UI — Imagen a DXF |
+| GET | `/health` | Estado del servidor |
+| GET | `/docs` | Swagger UI interactivo |
+| POST | `/api/planta/dxf` | Generar DXF de planta |
+| POST | `/api/planta/pdf` | Generar PDF de planta |
+| POST | `/api/planta/excel` | Generar Excel de planta |
+| POST | `/api/planta/preview` | Vista previa SVG de planta |
+| POST | `/api/planta/validate` | Validar parámetros NTC |
+| POST | `/api/cimentacion/dxf` | Generar DXF de cimentación |
+| POST | `/api/cimentacion/pdf` | Generar PDF de cimentación |
+| POST | `/api/cimentacion/excel` | Generar Excel de cimentación |
+| POST | `/api/cimentacion/preview` | Vista previa SVG |
+| POST | `/api/cimentacion/validate` | Validar parámetros NTC |
+| POST | `/api/carpinteria/dxf` | Generar DXF de carpintería |
+| POST | `/api/carpinteria/pdf` | Generar PDF |
+| POST | `/api/carpinteria/excel` | Generar Excel |
+| POST | `/api/carpinteria/preview` | Vista previa SVG |
+| POST | `/api/texto/dxf` | Texto → DXF |
+| POST | `/api/texto/pdf` | Texto → PDF |
+| POST | `/api/texto/excel` | Texto → Excel |
+| POST | `/api/texto/preview` | Texto → SVG |
+| POST | `/api/texto/validate` | Validar texto NTC |
+| POST | `/api/imagen/dxf` | Imagen → DXF |
+| POST | `/api/imagen/preview` | Imagen → SVG |
 
-## Tips for AutoCAD
+---
 
-* Open the `.dxf` with **File → Open** or drag it into AutoCAD.
-* Use `ZOOM E` to fit the drawing in the viewport.
-* The geometry is on separate layers (`CONTOURS`, `HATCHES`) — toggle visibility as needed.
-* Scale (`-s`) controls real-world size: `0.1` mm/px means a 1000 px wide image becomes 100 mm (10 cm) wide.
-* Increase `--epsilon` (e.g. `2.0`) to reduce node count and file size for complex images.
+## Estructura del proyecto
 
-## Dependencies
+```
+arqgen/
+├── main.py                          # FastAPI entry-point, 30 rutas
+├── requirements.txt
+├── backend/
+│   ├── core/
+│   │   ├── dxf_utils.py             # Utilidades DXF (capas, cotas, ejes)
+│   │   ├── ntc.py                   # Constantes y validador NTC-RCDF
+│   │   ├── catalog.py               # Catálogo de conceptos
+│   │   └── pdf_utils.py             # Render PDF con matplotlib
+│   ├── generators/
+│   │   ├── gen_planta.py            # Módulo 1 — Planta arquitectónica
+│   │   ├── gen_cimentacion.py       # Módulo 2 — Cimentación
+│   │   ├── gen_carpinteria.py       # Módulo 3 — Carpintería
+│   │   ├── gen_imagen.py            # Módulo 4 — Imagen a DXF
+│   │   └── gen_texto.py             # Módulo 5 — Texto a DXF
+│   └── routers/
+│       ├── router_planta.py
+│       ├── router_cimentacion.py
+│       ├── router_carpinteria.py
+│       ├── router_imagen.py
+│       └── router_texto.py
+├── frontend/
+│   ├── static/
+│   │   ├── css/arqgen.css
+│   │   └── js/arqgen.js
+│   └── templates/
+│       ├── index.html
+│       ├── planta.html
+│       ├── cimentacion.html
+│       ├── carpinteria.html
+│       ├── texto.html
+│       └── imagen.html
+└── deploy/
+    ├── Dockerfile
+    ├── nginx.conf
+    └── README_deploy.md
+```
 
-* [OpenCV](https://opencv.org/) — contour detection
-* [ezdxf](https://ezdxf.readthedocs.io/) — DXF writing
-* [Pillow](https://python-pillow.org/) — image loading
-* [NumPy](https://numpy.org/) — array operations
+---
+
+## Despliegue en producción
+
+El servidor corre en Ubuntu 25.10 con:
+- **nginx** como reverse proxy en puerto 8080
+- **uvicorn** con 2 workers en `127.0.0.1:8002`
+- **systemd** service (`arqgen.service`) con arranque automático
+
+Para actualizar el servidor desde este repositorio:
+
+```bash
+cd /var/www/arqgen
+git pull origin main
+sudo systemctl restart arqgen
+```
+
+---
+
+## Normas aplicadas
+
+| Norma | Descripción |
+|---|---|
+| NTC-RCDF 2017 | Normas Técnicas Complementarias del RCDF (Ciudad de México) |
+| NTC Concreto 2017 | Recubrimientos mínimos, armado de zapatas y castillos |
+| NTC Mampostería 2017 | Separación máxima entre castillos (4.0m), secciones mínimas |
+| CONAVI | Área mínima de vivienda de interés social |
+| INFONAVIT | Área mínima de construcción (42m²) |
+| SEDATU | Paso mínimo 900mm, criterios de accesibilidad |
