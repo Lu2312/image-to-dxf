@@ -1,24 +1,25 @@
 """
-gen_planta.py  v3
+gen_planta.py  v4
 -----------------
 Módulo 2 — Configurador de Planta Tipo (vivienda de interés social).
 
-Estándares CAD implementados (Prompt Maestro):
-  1. Capas con color/grosor/linetype definidos:
-       A-EJE (rojo, CENTER), A-MURO (blanco, 0.30mm), A-COTA (amarillo),
-       A-MUEBLE (gris), A-PUERTA (verde), A-VENTANA (cian),
-       A-CORTADO (0.50mm = elementos en corte),
-       A-PROYECTADO (0.09mm = proyección)
-  2. Malla de ejes primero (CENTER linetype, sobresalen 1000mm),
-     luego muros desfasados em/2 de cada eje (no rectángulos aislados)
-  3. Globos con nomenclatura: ejes verticales 1,2,3... / horizontales A,B,C...
-  4. Entidades DIMENSION reales (add_linear_dim, no líneas sueltas)
+Estándares CAD implementados:
+  1. Capas con color/grosor/linetype definidos
+  2. Malla de ejes primero (CENTER linetype, sobresalen 1000mm)
+  3. Globos de eje: verticales 1,2,3... / horizontales A,B,C...
+  4. Entidades DIMENSION reales de AutoCAD
   5. Puertas: LINE umbral + ARC de batiente 90°
   6. Ventanas: triple línea paralela en muro exterior
-  7. Alzado frontal: niveles NPT±0.00, Cerramiento, Losa; proyecciones
-     verticales alineadas exactamente con ejes X de la planta
-  8. Corte A-A': elementos cortados (grosor 50) vs. proyectados (grosor 9)
-  9. Distancias mínimas validadas: paso ≥900mm (SEDATU), altura ≥2.3m (RCDF)
+  7. Alzado frontal con niveles NPT±0.00, Cerramiento y Losa
+  8. Corte A-A' con grosor diferenciado cortado vs. proyectado
+  9. Distancias mínimas validadas (SEDATU/RCDF)
+
+Sistema de Agentes Estructurales (v4):
+  AnalistaEspacial  → detecta muros, nodos e intersecciones (L/T/CROSS)
+  IngenieroNormativo → aplica NTC Mampostería §6.3-6.4: castillos en esquinas
+                       e intermedios; dalas de cerramiento §7.2
+  GeneradorGeometria → dibuja castillos (E-CASTILLO) y dalas (E-DALA) en DXF
+                       con LWPOLYLINE+HATCH+etiqueta de armado
 """
 from __future__ import annotations
 
@@ -40,6 +41,10 @@ from ..core.ntc import (
     CASTILLO_MIN, ESPESOR_MURO_STD, LAYERS,
 )
 from ..core.catalog import CatalogoConceptos
+from ..core.modelo_estructural import MetadatosNormativos, ModeloEstructural
+from ..agents.analista_espacial import AnalistaEspacial
+from ..agents.ingeniero_normativo import IngenieroNormativo
+from ..agents.generador_geometria import GeneradorGeometria
 
 
 # ---------------------------------------------------------------------------
@@ -101,6 +106,7 @@ class PlantaResult:
     catalog:     CatalogoConceptos
     ntc_report:  dict
     svg_preview: str
+    modelo_estructural: ModeloEstructural | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -150,10 +156,34 @@ class PlantaGenerator:
         for r in recintos:
             self._draw_window(msp, r, p, em)
 
-        # ── 8. Castillos NTC (esquinas + cada ≤4 m) ──────────────────
-        castillos = self._suggest_castillos(p, recintos, em)
-        for cx, cy in castillos:
-            self._draw_castillo(msp, cx, cy, CASTILLO_MIN["lado"])
+        # ── 8. Sistema de agentes estructurales ──────────────────────
+        #   AnalistaEspacial → IngenieroNormativo → GeneradorGeometria
+        by1_calc = (max(r.y + r.fondo + em for r in recintos)
+                    if recintos else p.lote_fondo)
+        recintos_dicts = [
+            {"x": r.x, "y": r.y, "ancho": r.ancho,
+             "fondo": r.fondo, "nombre": r.nombre}
+            for r in recintos
+        ]
+        topo = AnalistaEspacial().analizar(
+            recintos=recintos_dicts,
+            espesor_muro=em,
+            lote_ancho=p.lote_ancho,
+            lote_fondo=by1_calc,
+            altura_muro=p.altura_muro,
+        )
+        meta = MetadatosNormativos(
+            norma="NTC-RCDF 2017",
+            fc=200.0,
+            fy=4200.0,
+            recubrimiento=25.0,
+        )
+        modelo = IngenieroNormativo().disenar(topo, meta)
+        GeneradorGeometria().dibujar(doc, msp, modelo)
+
+        # Lista de coordenadas de castillos para el catálogo y SVG
+        castillos = [(ev.x, ev.y) for ev in modelo.elementos_verticales
+                     if ev.tipo == "CASTILLO"]
 
         # ── 9. Cadenas de cotas DIMENSION reales ─────────────────────
         if len(xs_axis) > 1:
@@ -213,6 +243,7 @@ class PlantaGenerator:
         return PlantaResult(
             dxf_bytes=dxf_bytes, pdf_bytes=pdf_bytes, xlsx_bytes=xlsx_bytes,
             catalog=cat, ntc_report=validator.report(), svg_preview=svg,
+            modelo_estructural=modelo,
         )
 
     # ------------------------------------------------------------------

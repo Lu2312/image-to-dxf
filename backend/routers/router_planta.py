@@ -81,3 +81,16 @@ def gen_preview(body: PlantaIn):
         "ntc": result.ntc_report,
         "catalog": result.catalog.to_rows(),
     })
+
+
+@router.post("/modelo")
+def gen_modelo(body: PlantaIn):
+    """
+    Devuelve el ModeloEstructural en JSON antes de generar el DXF.
+    Permite auditar la decisión estructural (castillos, dalas, advertencias)
+    como ingeniero, sin necesidad de abrir AutoCAD.
+    """
+    result = PlantaGenerator().generate(_params(body))
+    if result.modelo_estructural is None:
+        return JSONResponse({"error": "modelo no disponible"}, status_code=500)
+    return JSONResponse(result.modelo_estructural.to_dict())
