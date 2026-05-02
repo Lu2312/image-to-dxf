@@ -3,128 +3,258 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ArqGen — Generador de Planos NTC</title>
+  <title>ArqGen — Convierte Imagen y Texto a DXF | Gratis</title>
+  <meta name="description" content="Convierte imágenes PNG/JPG a DXF vectorial y genera planos desde texto. Herramientas gratuitas para AutoCAD."/>
   <link rel="stylesheet" href="/static/css/arqgen.css"/>
+  <!--
+    ════════════════════════════════════════════════════
+    GOOGLE ADSENSE — reemplaza ca-pub-XXXX con tu ID
+    una vez que tu cuenta sea aprobada
+    ════════════════════════════════════════════════════
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+  -->
 </head>
 <body>
 
 <nav>
   <a class="nav-brand" href="/">Arq<span>Gen</span></a>
-  <a href="/cimentacion">Cimentación</a>
-  <a href="/planta">Planta</a>
+  <a href="/imagen" class="nav-highlight">🖼️ Imagen→DXF</a>
+  <a href="/texto" class="nav-highlight">✏️ Texto→DXF</a>
   <a href="/carpinteria">Carpintería</a>
-  <a href="/texto">Texto→DXF</a>
-  <a href="/imagen">Imagen→DXF</a>
+  <a href="#planes">Planes</a>
   <a href="/docs" target="_blank">API</a>
 </nav>
 
+<!-- ── BANNER AD TOP (728×90 leaderboard) ──────────────────── -->
+<div class="ad-slot ad-leaderboard" aria-label="Publicidad">
+  <!--
+  <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px"
+       data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+       data-ad-slot="XXXXXXXXXX"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  -->
+  <div class="ad-placeholder">
+    <span class="ad-label">Publicidad</span>
+    <span class="ad-size">728 × 90</span>
+  </div>
+</div>
+
 <div class="hero">
-  <span class="badge">NTC-RCDF Ciudad de México</span>
-  <h1>Genera planos técnicos<br>en <em>segundos</em></h1>
+  <span class="badge">✓ 100% Gratis · Sin registro · Sin instalación</span>
+  <h1>De imagen o texto<br>a <em>DXF vectorial</em></h1>
   <p>
-    Ingresa los parámetros de tu proyecto y descarga DXF listo para AutoCAD,
-    PDF imprimible y catálogo de conceptos en Excel — bajo normativa NTC.
+    Sube una foto o croquis, o escribe la descripción de tu proyecto,
+    y descarga el DXF listo para AutoCAD en segundos.
   </p>
+  <div class="hero-cta">
+    <a class="btn btn-featured" href="/imagen">🖼️ Convertir Imagen → DXF</a>
+    <a class="btn btn-featured-outline" href="/texto">✏️ Generar desde Texto</a>
+  </div>
 </div>
 
 <div class="container">
+
+  <!-- ── SECCIÓN: HERRAMIENTAS GRATIS ──────────────────────── -->
+  <div class="section-label">
+    <span class="section-badge free">GRATIS</span>
+    <h2 class="section-title">Herramientas disponibles ahora</h2>
+  </div>
+
+  <div class="cards cards-featured">
+
+    <a class="card card-star" href="/imagen">
+      <div class="card-star-badge">⭐ Popular</div>
+      <div class="card-icon">🖼️</div>
+      <h3>Imagen → DXF</h3>
+      <p>
+        Sube cualquier PNG, JPG o BMP y obtén entidades DXF vectoriales:
+        contornos LWPOLYLINE, rellenos HATCH sólido o cuadrícula de píxeles.
+        Ideal para digitalizar logos, croquis y planos escaneados.
+      </p>
+      <ul class="card-features">
+        <li>✓ 3 modos: Trace · Hatch · Pixel</li>
+        <li>✓ Simplificación Douglas-Peucker</li>
+        <li>✓ DXF R2010 (AutoCAD 2000+)</li>
+        <li>✓ Sin límite de tamaño</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">DXF</span>
+        <span class="tag tag-free">GRATIS</span>
+        <span class="tag">Sin registro</span>
+      </div>
+    </a>
+
+    <a class="card card-star" href="/texto">
+      <div class="card-star-badge new">✨ Nuevo</div>
+      <div class="card-icon">✏️</div>
+      <h3>Texto → DXF</h3>
+      <p>
+        Describe tu vivienda en español y ArqGen genera el plano completo
+        automáticamente. Sin conocer CAD. Sin parámetros técnicos.
+      </p>
+      <ul class="card-features">
+        <li>✓ Lenguaje natural en español</li>
+        <li>✓ Detecta recintos, dimensiones y lote</li>
+        <li>✓ Salida: DXF + PDF + Excel</li>
+        <li>✓ Validación NTC-RCDF incluida</li>
+      </ul>
+      <div class="card-example">
+        <span class="example-label">Ejemplo:</span>
+        <em>"Casa de 3 recámaras, sala-comedor, cocina, 2 baños, lote 8×15 m"</em>
+      </div>
+      <div class="tags">
+        <span class="tag">DXF</span>
+        <span class="tag">PDF</span>
+        <span class="tag tag-free">GRATIS</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- AD SLOT — Rectangle 300×250 -->
+  <div class="ad-slot ad-rectangle" aria-label="Publicidad">
+    <!--
+    <ins class="adsbygoogle" style="display:block;width:300px;height:250px"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    -->
+    <div class="ad-placeholder">
+      <span class="ad-label">Publicidad</span>
+      <span class="ad-size">300 × 250</span>
+    </div>
+  </div>
+
+  <!-- ── SECCIÓN: MÓDULOS EN DESARROLLO ──────────────────────── -->
+  <div class="section-label" style="margin-top:3rem;">
+    <span class="section-badge pro">PRO · En desarrollo</span>
+    <h2 class="section-title">Módulos de ingeniería — Próximamente</h2>
+    <p class="section-sub">Disponibles por suscripción cuando alcancen nivel profesional</p>
+  </div>
+
   <div class="cards">
 
-    <a class="card" href="/cimentacion">
-      <div class="card-icon">🏗️</div>
-      <h3>Cimentación</h3>
+    <div class="card card-coming-soon">
+      <div class="coming-soon-ribbon">En desarrollo</div>
+      <div class="card-icon" style="opacity:.45">📐</div>
+      <h3>Planta Arquitectónica <span class="pro-badge">PRO</span></h3>
       <p>
-        Planta de cimentación, cortes de zapatas corridas con armado,
-        tabla de acero y catálogo de conceptos (excavación, concreto, acero).
+        Configurador paramétrico con castillos NTC, malla de ejes,
+        alzado frontal, corte A-A' y catálogo de conceptos.
       </p>
-      <div class="tags">
-        <span class="tag">DXF</span>
-        <span class="tag">PDF A1</span>
-        <span class="tag">Excel</span>
-        <span class="tag">NTC Cimentaciones</span>
+      <div class="coming-soon-bar"><div class="coming-soon-progress" style="width:20%"></div></div>
+      <p class="coming-soon-pct">20% completado</p>
+      <div class="tags" style="opacity:.4">
+        <span class="tag">DXF</span><span class="tag">NTC Mampostería</span>
       </div>
-    </a>
+    </div>
 
-    <a class="card" href="/planta">
-      <div class="card-icon">📐</div>
-      <h3>Planta Arquitectónica</h3>
+    <div class="card card-coming-soon">
+      <div class="coming-soon-ribbon">En desarrollo</div>
+      <div class="card-icon" style="opacity:.45">🏗️</div>
+      <h3>Cimentación <span class="pro-badge">PRO</span></h3>
       <p>
-        Configurador de planta tipo: define el lote y el programa, el sistema
-        distribuye los recintos y ubica castillos cada ≤4 m (NTC Mampostería).
+        Diseño de zapatas corridas y aisladas bajo NTC, cortes con armado,
+        tabla de acero y catálogo completo.
       </p>
-      <div class="tags">
-        <span class="tag">DXF</span>
-        <span class="tag">PDF A1</span>
-        <span class="tag">Excel</span>
-        <span class="tag">NTC Mampostería</span>
+      <div class="coming-soon-bar"><div class="coming-soon-progress" style="width:20%"></div></div>
+      <p class="coming-soon-pct">20% completado</p>
+      <div class="tags" style="opacity:.4">
+        <span class="tag">DXF</span><span class="tag">NTC Cimentaciones</span>
       </div>
-    </a>
+    </div>
 
     <a class="card" href="/carpinteria">
       <div class="card-icon">🚪</div>
       <h3>Carpintería / Cancelería</h3>
       <p>
-        Alzados técnicos de ventanas, puertas y closets con cotas, despiece
-        de piezas y catálogo de materiales.
+        Alzados técnicos de ventanas, puertas y closets con cotas,
+        despiece de piezas y catálogo de materiales.
       </p>
       <div class="tags">
         <span class="tag">DXF</span>
         <span class="tag">PDF A3</span>
-        <span class="tag">Excel</span>
         <span class="tag">Aluminio · Madera · PVC</span>
       </div>
     </a>
 
-    <a class="card" href="/texto">
-      <div class="card-icon">✏️</div>
-      <h3>Texto → DXF</h3>
-      <p>
-        Describe tu vivienda en español natural y ArqGen genera la planta
-        arquitectónica completa: "Casa de 3 recámaras, sala-comedor, cocina,
-        2 baños, lote 8×15 m".
-      </p>
-      <div class="tags">
-        <span class="tag">NL Parser</span>
-        <span class="tag">DXF</span>
-        <span class="tag">PDF</span>
-        <span class="tag">CONAVI</span>
-      </div>
-    </a>
-
-    <a class="card" href="/imagen">
-      <div class="card-icon">🖼️</div>
-      <h3>Imagen → DXF</h3>
-      <p>
-        Sube una imagen (PNG/JPG/BMP) y conviértela a entidades DXF:
-        contornos con LWPOLYLINE, rellenos HATCH o malla de píxeles.
-        Ideal para digitalizar croquis a mano.
-      </p>
-      <div class="tags">
-        <span class="tag">Trace</span>
-        <span class="tag">Hatch</span>
-        <span class="tag">Pixel</span>
-        <span class="tag">DXF R2010</span>
-      </div>
-    </a>
-
   </div>
 
-  <div style="margin-top:3rem; padding:1.5rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; max-width:700px; margin-left:auto; margin-right:auto;">
-    <h3 style="color:var(--accent2); margin-bottom:.75rem;">¿Cómo funciona?</h3>
-    <ol style="color:var(--muted); font-size:.9rem; line-height:1.8; padding-left:1.2rem;">
-      <li>Elige el módulo que necesitas (Cimentación, Planta o Carpintería).</li>
-      <li>Ingresa los parámetros del proyecto (ejes, dimensiones, materiales).</li>
-      <li>Haz clic en <strong style="color:var(--text)">Preview</strong> para ver el SVG en pantalla.</li>
-      <li>Descarga <strong style="color:var(--text)">DXF</strong>, <strong style="color:var(--text)">PDF</strong> o el <strong style="color:var(--text)">Catálogo Excel</strong>.</li>
-      <li>El sistema valida automáticamente el cumplimiento de las <strong style="color:var(--accent2)">NTC-RCDF</strong>.</li>
-    </ol>
+  <!-- AD SLOT — Banner responsive entre secciones -->
+  <div class="ad-slot ad-banner" aria-label="Publicidad" style="margin:2.5rem auto;">
+    <!--
+    <ins class="adsbygoogle" style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    -->
+    <div class="ad-placeholder ad-placeholder-wide">
+      <span class="ad-label">Publicidad</span>
+      <span class="ad-size">Banner Responsive</span>
+    </div>
   </div>
+
+  <!-- ── SECCIÓN: PLANES ──────────────────────────────────────── -->
+  <section id="planes" class="plans-section">
+    <h2 class="plans-title">Planes</h2>
+    <p class="plans-sub">Las herramientas de conversión siempre serán gratis. Los módulos de ingeniería requerirán suscripción cuando estén listos.</p>
+    <div class="plans-grid">
+
+      <div class="plan-card plan-free">
+        <div class="plan-name">Gratis</div>
+        <div class="plan-price">$0 <span>/ siempre</span></div>
+        <ul class="plan-features">
+          <li>✓ Imagen → DXF (ilimitado)</li>
+          <li>✓ Texto → DXF</li>
+          <li>✓ Carpintería básica</li>
+          <li>✓ API REST pública</li>
+          <li class="disabled">— Planta arquitectónica</li>
+          <li class="disabled">— Cimentación y armado</li>
+          <li class="disabled">— Validación NTC completa</li>
+        </ul>
+        <a class="btn btn-primary" href="/imagen" style="width:100%;justify-content:center;margin-top:1.2rem;">Empezar gratis</a>
+      </div>
+
+      <div class="plan-card plan-pro">
+        <div class="plan-ribbon">Próximamente</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><small>desde</small> $X <span>/ mes</span></div>
+        <ul class="plan-features">
+          <li>✓ Todo lo de Gratis</li>
+          <li>✓ Planta arquitectónica completa</li>
+          <li>✓ Cimentación con armado NTC</li>
+          <li>✓ Modelo estructural JSON auditable</li>
+          <li>✓ PDF papel A1 / A0</li>
+          <li>✓ Catálogo Excel de conceptos</li>
+          <li>✓ Soporte prioritario</li>
+        </ul>
+        <button class="btn btn-outline" disabled style="width:100%;justify-content:center;margin-top:1.2rem;cursor:not-allowed;opacity:.6;">Próximamente</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── ¿CÓMO FUNCIONA? ─────────────────────────────────────── -->
+  <div class="how-it-works">
+    <h3>¿Cómo funciona?</h3>
+    <div class="steps">
+      <div class="step"><span class="step-n">1</span><p>Sube tu imagen PNG/JPG o escribe una descripción</p></div>
+      <div class="step-arrow">→</div>
+      <div class="step"><span class="step-n">2</span><p>Elige el modo de conversión</p></div>
+      <div class="step-arrow">→</div>
+      <div class="step"><span class="step-n">3</span><p>Descarga el DXF listo para AutoCAD</p></div>
+    </div>
+  </div>
+
 </div>
 
 <footer>
-  <strong>ArqGen</strong> — Generador paramétrico bajo NTC-RCDF &nbsp;|&nbsp;
-  Desarrollado con FastAPI + ezdxf &nbsp;|&nbsp;
-  <a href="/docs" style="color:var(--accent2)">API Docs</a>
+  <strong>ArqGen</strong> — Conversión DXF y generación de planos &nbsp;|&nbsp;
+  <a href="/imagen" style="color:var(--accent2)">Imagen→DXF</a> &nbsp;|&nbsp;
+  <a href="/texto" style="color:var(--accent2)">Texto→DXF</a> &nbsp;|&nbsp;
+  <a href="/docs" style="color:var(--accent2)">API</a>
 </footer>
 
 </body>
