@@ -85,6 +85,11 @@ def page_imagen():
     return FileResponse(TEMPLATES / "imagen.html")
 
 
+@app.get("/privacidad", response_class=FileResponse)
+def page_privacidad():
+    return FileResponse(TEMPLATES / "privacidad.html")
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "arqgen"}
