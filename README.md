@@ -1,201 +1,210 @@
-<!DOCTYPE html>IFICATE------- */ral Drawing Generator
+﻿# Lu CAD Studio — Image & Text to DXF
 
-    server_name lucadstudio.com www.lucadstudio.com;toCAD.
+Herramienta web para convertir imágenes y texto a planos DXF, con eliminación de fondo por IA.  
+Disponible en [lucadstudio.com](https://lucadstudio.com).
 
-    	        return 301 https://$host$request_uri;
-  <title>ArqGen — Convert Image and Text to DXF | Free</title>
-| Feature | Detail |
+## Funcionalidades
+
+| Módulo | Descripción |
 |---|---|
-    listen 443 ssl;des** | `trace`, `hatch`, `pixel` |
-  <!-- Google AdSense --> AC1015 (AutoCAD 2000+), mm units, named layers |
-| **Contour tracing** | OpenCV `findContours` + optional Douglas-Peucker simplification |
-| **Smooth curves** | Optional SPLINE entities (cubic B-spline) |
-    ssl_certificate     /etc/ssl/cloudflare/cert.pem; |
-    ssl_certificate     /etc/ssl/certs/ssl-cert-snakeoil.pem;/fullchain.pem; INFO layer |
-| **GUI** | Resizable Tkinter app with live image preview and DXF preview |
-| **CLI** | Full command-line interface with stats output |
+| **Imagen → DXF** | Convierte PNG/JPG a entidades DXF (trazado de contornos con OpenCV) |
+| **Quitar fondo** | Eliminación de fondo por IA usando rembg (modelo U2Net) |
+| **Texto → DXF** | Genera planos DXF a partir de parámetros de texto |
 
-## Conversion modes
+## Requisitos
 
-| Mode | What it produces | Best for |
-  <a href="/imagen" class="nav-highlight">→DXF🖼️ image</a>
-| `trace` | LWPOLYLINE (or SPLINE) outlines | Line art, logos, signatures |
-| `hatch` | Outlined + solid-filled HATCH shapes | Silhouettes, filled logos |
-| `pixel` | One SOLID square per dark pixel | Pixel art, small rasters |
+- Python 3.11+
+- pip
 
-## Installation
+## Instalación local
 
 ```bash
-Installation requirements.txt
+git clone https://github.com/Lu2312/image-to-dxf.git
+cd image-to-dxf
+
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/macOS:
+source .venv/bin/activate
+
+pip install -r requirements.txt
 ```
 
-### Requirements
-
-| Package | Minimum version |
-|---|---|
-| `opencv-python` | 4.8.0 |
-| `ezdxf` | 1.1.0 |
-| `Pillow` | 10.0.0 |
-| `numpy` | 1.24.0 |
-| `matplotlib` | 3.7.0 |
-
-## Quick start
-  <span class="badge">✓ 100% Free · No registration · No installation</span>
-### GUI
+## Ejecutar en desarrollo
 
 ```bash
-python gui.py
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-1. Click **Browse…** next to *Input image* and select a PNG / JPG / BMP / TIFF.
-2. The thumbnail appears immediately in the **Original image** tab on the right.
-3. Adjust options (mode, scale, threshold, …) as needed.
-4. Optionally type a **Drawing title** – it will be embedded in the DXF INFO layer.
-5. Click **⚙ Convert to DXF**.
-6. After conversion the **DXF preview** tab shows a rendered view of all entities.
-7. Conversion statistics (contours, entities, drawing size) appear in the left panel.
+Abre http://localhost:8000.
 
-### CLI
+---
+
+## Despliegue en producción (Ubuntu/Debian VPS)
+
+### 1. Dependencias del sistema
 
 ```bash
-python image_to_dxf.py input.png
-python image_to_dxf.py input.png -o output.dxf -m hatch -s 0.25
+apt-get update
+apt-get install -y python3 python3-venv python3-pip git nginx libgl1 libglib2.0-0 libgomp1
 ```
 
-Sample output:
+> `libgl1` y `libglib2.0-0` son requeridos por OpenCV headless.
+> `libgomp1` es requerido por onnxruntime (usado por rembg).
 
-```
-DXF saved to: output.dxf
-  Contours : 14
-  Entities : 31
-  Size     : 128.0 x 64.0 mm
-```
-
-### Python API
-
-```python
-from image_to_dxf import convert
-
-result = convert(
-    "logo.png",
-    "logo.dxf",
-    mode="hatch",       # "trace" | "hatch" | "pixel"
-    scale=0.25,         # mm per pixel
-    threshold=127,      # greyscale binarisation threshold (0-255)
-    min_area=10.0,      # discard contours smaller than this (px²)
-    approx_epsilon=0.5, # Douglas-Peucker simplification (px); 0 = off
-    lineweight=25,      # 1/100 mm
-@app.get("/privacy", response_class=FileResponse)
-)
-
-print(result.path)           # pathlib.Path to the saved DXF
-print(result.contour_count)  # number of contours found
-print(result.entity_count)   # number of DXF entities written
-print(result.dxf_width)      # drawing width in mm
-print(result.dxf_height)     # drawing height in mm
-```
-
-## CLI reference
-
-```
-usage: image_to_dxf.py [-h] [-o OUTPUT] [-m {trace,hatch,pixel}]
-                        [-s SCALE] [-t THRESHOLD]
-                        [--min-area MIN_AREA] [--epsilon EPSILON]
-                        [--spline] [--lineweight LINEWEIGHT]
-                        [--layer-contour LAYER_CONTOUR]
-                        [--layer-hatch LAYER_HATCH]
-                        input
-
-positional arguments:
-  input                      Source image path
-
-options:
-  -o, --output OUTPUT        Output DXF path (default: same dir/name as input)
-  -m, --mode {trace,hatch,pixel}
-                             Conversion mode (default: trace)
-  -s, --scale SCALE          mm per pixel (default: 0.1)
-  -t, --threshold THRESHOLD  Greyscale threshold 0-255 (default: 127)
-  --min-area MIN_AREA        Minimum contour area in px² (default: 10)
-  --epsilon EPSILON          Douglas-Peucker simplification in px (default: 0.5)
-  --spline                   Use SPLINE entities instead of LWPOLYLINE
-  --lineweight LINEWEIGHT    Lineweight in 1/100 mm (default: 25)
-  --layer-contour NAME       Layer name for contour entities (default: CONTOURS)
-  --layer-hatch NAME         Layer name for hatch entities (default: HATCHES)
-```
-
-## DXF layer structure
-
-| Layer | Content | Default ACI colour |
-|---|---|---|
-| `CONTOURS` | Traced polylines / splines | 7 (white/black) |
-| `HATCHES` | Solid hatch fills | 2 (yellow) |
-| `PIXELS` | Pixel-mode SOLID squares | 3 (green) |
-| `INFO` | Title block text and separator line | 8 (dark grey) |
-
-## Running the tests
+### 2. Clonar el repositorio
 
 ```bash
-pip install pytest
-pytest test_image_to_dxf.py -v
+mkdir -p /var/www/arqgen
+cd /var/www/arqgen
+git clone https://github.com/Lu2312/image-to-dxf.git .
 ```
 
-## Project structure
+### 3. Crear el entorno virtual e instalar dependencias
+
+```bash
+python3 -m venv venv
+venv/bin/pip install --upgrade pip
+venv/bin/pip install -r requirements.txt
+```
+
+### 4. Permisos
+
+```bash
+chown -R www-data:www-data /var/www/arqgen
+```
+
+### 5. Servicio systemd
+
+Crea `/etc/systemd/system/arqgen.service`:
+
+```ini
+[Unit]
+Description=Lu CAD Studio - FastAPI App
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/arqgen
+ExecStart=/var/www/arqgen/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8002 --workers 1
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> **Importante:** Usar `--workers 1`. Con rembg/onnxruntime cargados, 2 workers superan el limite de RAM en un droplet de 1 GB.
+
+Activar y arrancar:
+
+```bash
+systemctl daemon-reload
+systemctl enable arqgen
+systemctl start arqgen
+systemctl status arqgen
+```
+
+### 6. Nginx como proxy inverso
+
+Crea `/etc/nginx/sites-available/lucadstudio`:
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name lucadstudio.com www.lucadstudio.com;
+
+    location /static/ {
+        alias /var/www/arqgen/frontend/static/;
+        expires 30d;
+        add_header Cache-Control public;
+    }
+
+    location / {
+        proxy_pass         http://127.0.0.1:8002;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_redirect     off;
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+        client_max_body_size 20M;
+    }
+}
+```
+
+```bash
+ln -s /etc/nginx/sites-available/lucadstudio /etc/nginx/sites-enabled/
+nginx -t
+systemctl reload nginx
+```
+
+### 7. SSL con Cloudflare
+
+Si usas Cloudflare con SSL en modo **Full (strict)**:
+
+1. En Cloudflare: activa el proxy (nube naranja) para el dominio.
+2. En el VPS: instala el certificado de origen de Cloudflare en `/etc/ssl/cloudflare/` y configura el bloque `443 ssl` en nginx apuntando a el.
+3. Alternativamente, usa SSL modo **Flexible** si el certificado del servidor es autofirmado.
+
+---
+
+## Script de actualizacion
+
+Guarda este script en `/root/update-arqgen.sh` para futuros deploys:
+
+```bash
+#!/bin/bash
+set -e
+echo '=== Actualizando Lu CAD Studio ==='
+cd /var/www/arqgen
+git fetch origin main
+git reset --hard origin/main
+chown -R www-data:www-data /var/www/arqgen
+/var/www/arqgen/venv/bin/pip install -r requirements.txt -q
+systemctl restart arqgen
+sleep 3
+systemctl status arqgen --no-pager
+echo '=== Listo ==='
+```
+
+```bash
+chmod +x /root/update-arqgen.sh
+/root/update-arqgen.sh
+```
+
+---
+
+## Estructura del proyecto
 
 ```
 image-to-dxf/
-├── image_to_dxf.py      # Core converter library + CLI entry-point
-├── gui.py               # Tkinter GUI with image & DXF preview
-├── test_image_to_dxf.py # pytest test suite
-├── requirements.txt     # Python dependencies
-└── README.md
+├── main.py                  # Entrada FastAPI, rutas, endpoint /remove-bg
+├── requirements.txt
+├── backend/
+│   ├── routers/             # Endpoints: router_imagen, router_texto
+│   └── generators/          # Logica DXF: gen_imagen, gen_texto
+├── frontend/
+│   ├── static/              # CSS, JS
+│   └── templates/           # HTML: index, imagen, texto, limpieza, privacidad
+├── deploy/
+│   ├── Dockerfile
+│   └── lucadstudio.nginx.conf
+└── tests/
 ```
 
+## Dependencias principales
 
-## GUI usage
-
-```bash
-python gui.py
-```
-
-1. Click **Browse…** to select your image (PNG, JPG, BMP, TIFF, …).
-2. Choose an output path (auto-filled from the input name).
-3. Adjust options if needed.
-4. Click **Convert**.
-
-## CLI usage
-
-```bash
-python image_to_dxf.py input.png
-python image_to_dxf.py input.png -o output.dxf -m hatch -s 0.2
-python image_to_dxf.py logo.png --spline --epsilon 1.0
-```
-
-### All CLI flags
-
-| Flag | Default | Description |
-|---|---|---|
-| `-o / --output` | same name as input | Output `.dxf` path |
-| `-m / --mode` | `trace` | `trace` / `hatch` / `pixel` |
-| `-s / --scale` | `0.1` | mm per pixel |
-| `-t / --threshold` | `127` | Greyscale threshold (0-255) |
-| `--min-area` | `10` | Minimum contour area (px²) |
-| `--epsilon` | `0.5` | Douglas-Peucker simplification (px); `0` = off |
-| `--spline` | off | Use SPLINE entities (trace mode) |
-| `--lineweight` | `25` | Lineweight in 1/100 mm |
-| `--layer-contour` | `CONTOURS` | Layer name for outlines |
-| `--layer-hatch` | `HATCHES` | Layer name for fills |
-
-## Tips for AutoCAD
-
-* Open the `.dxf` with **File → Open** or drag it into AutoCAD.
-* Use `ZOOM E` to fit the drawing in the viewport.
-* The geometry is on separate layers (`CONTOURS`, `HATCHES`) — toggle visibility as needed.
-* Scale (`-s`) controls real-world size: `0.1` mm/px means a 1000 px wide image becomes 100 mm (10 cm) wide.
-* Increase `--epsilon` (e.g. `2.0`) to reduce node count and file size for complex images.
-
-## Dependencies
-
-* [OpenCV](https://opencv.org/) — contour detection
-* [ezdxf](https://ezdxf.readthedocs.io/) — DXF writing
-.ntc-error { color: var(--danger);  font-size: .85rem; }
-* [NumPy](https://numpy.org/) — array operations
+| Paquete | Uso |
+|---|---|
+| `fastapi` + `uvicorn` | Servidor web |
+| `ezdxf` | Generacion de archivos DXF |
+| `opencv-python-headless` | Procesamiento de imagenes (sin GUI) |
+| `Pillow` | Manejo de imagenes |
+| `rembg[cpu]` | Eliminacion de fondo por IA (U2Net) |
+| `PyMuPDF` | Extraccion de texto desde PDF |
+| `python-multipart` | Soporte de subida de archivos en FastAPI |
