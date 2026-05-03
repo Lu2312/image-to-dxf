@@ -98,9 +98,16 @@ async def remove_background(file: UploadFile = File(..., description="Imagen PNG
         from rembg import remove, new_session  # lazy: no carga onnxruntime en arranque
         global _rembg_session
         if _rembg_session is None:
-            _rembg_session = new_session("u2netp")  # modelo ligero ~4.7 MB vs ~176 MB
-        # rembg devuelve PNG con canal alfa
-        result = remove(image_bytes, session=_rembg_session)
+            _rembg_session = new_session("isnet-general-use")  # mejor calidad que u2net/u2netp
+        # rembg devuelve PNG con canal alfa; alpha_matting suaviza bordes
+        result = remove(
+            image_bytes,
+            session=_rembg_session,
+            alpha_matting=True,
+            alpha_matting_foreground_threshold=240,
+            alpha_matting_background_threshold=10,
+            alpha_matting_erode_size=10,
+        )
         img = Image.open(BytesIO(result))
         out = BytesIO()
         img.save(out, format="PNG")

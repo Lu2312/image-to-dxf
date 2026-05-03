@@ -98,7 +98,7 @@ WantedBy=multi-user.target
 
 > **Importante:** Usar `--workers 1`. Con rembg/onnxruntime cargados, 2 workers superan el limite de RAM en un droplet de 1 GB.
 
-Activar y arrancar:
+            _rembg_session = new_session("isnet-general-use")  # better quality than u2net/u2netp
 
 ```bash
 systemctl daemon-reload
@@ -206,7 +206,7 @@ El endpoint `/remove-bg` usa `rembg` con `onnxruntime` para inferencia de IA. En
 | Síntoma | Causa | Solución |
 |---|---|---|
 | OOM killer terminaba el proceso | `--workers 2` = 2 instancias de onnxruntime en RAM | Usar **`--workers 1`** en uvicorn |
-| OOM en la primera inferencia (549 MB pico) | Modelo `u2net.onnx` pesa 176 MB y ocupa ~500 MB en inferencia | Cambiar al modelo **`u2netp`** (4.7 MB, ~80 MB en inferencia) |
+| OOM en la primera inferencia (549 MB pico) | Modelo `u2net.onnx` pesa 176 MB y ocupa ~500 MB en inferencia | Cambiar al modelo **`isnet-general-use`** + swap 2 GB |
 | Sin margen para picos de RAM | Solo 1 GB físico, sin swap | Añadir **2 GB de swap** permanente |
 | Sesión ONNX recreada en cada request | Nueva sesión = recarga del modelo en RAM | **Cachear la sesión** en variable global |
 
@@ -235,16 +235,17 @@ Con `--workers 1` uvicorn procesa requests de forma **concurrente pero no parale
 
 Si en el futuro el tráfico justifica paralelismo real, la opción correcta es escalar verticalmente (droplet 2 GB) antes de aumentar workers.
 
-### Modelo u2netp vs u2net
+### isnet-general-use vs u2net vs u2netp model
 
-| | `u2net` (original) | `u2netp` (producción) |
-|---|---|---|
-| Tamaño del modelo | 176 MB | 4.7 MB |
-| RAM en inferencia | ~500 MB | ~130 MB |
-| Calidad | Alta | Ligeramente inferior en bordes complejos |
-| Adecuado para | GPU / RAM ≥ 4 GB | VPS 1 GB / CPU |
+| | `u2net` | `u2netp` | `isnet-general-use` (producción) |
+|---|---|---|---|
+| Tamaño del modelo | 176 MB | 4.7 MB | 176 MB |
+| RAM en inferencia | ~500 MB | ~130 MB | ~500 MB + alpha matting |
+| Calidad de bordes | Alta | Baja | **Muy alta** |
+| Alpha matting | Opcional | Opcional | ✅ Activado |
+| Adecuado para | GPU / RAM ≥ 4 GB | VPS 1 GB sin swap | **VPS 1 GB + 2 GB swap** |
 
-El modelo se descarga automáticamente en la primera llamada al endpoint y se cachea en `/var/www/arqgen/.u2net/u2netp.onnx`.
+El modelo se descarga automáticamente en la primera llamada al endpoint y se cachea en `/var/www/arqgen/.u2net/isnet-general-use.onnx`.
 
 ---
 
