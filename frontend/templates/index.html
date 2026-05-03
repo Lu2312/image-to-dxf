@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ArqGen — Convierte Imagen y Texto a DXF | Gratis</title>
+  <title>Lu CAD Studio — Convierte Imagen y Texto a DXF | Gratis</title>
   <meta name="description" content="Convierte imágenes PNG/JPG a DXF vectorial y genera planos desde texto. Herramientas gratuitas para AutoCAD — lucadstudio.com"/>
   <link rel="canonical" href="https://lucadstudio.com/"/>
 
@@ -17,10 +17,10 @@
 <body>
 
 <nav>
-  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
+  <a class="nav-brand" href="/">Lu CAD Studio</a>
   <a href="/imagen" class="nav-highlight">🖼️ Imagen→DXF</a>
+  <a href="/limpieza" class="nav-highlight">🧼 Quitar fondo</a>
   <a href="/texto" class="nav-highlight">✏️ Texto→DXF</a>
-  <a href="/carpinteria">Carpintería</a>
   <a href="#planes">Planes</a>
   <a href="/docs" target="_blank">API</a>
 </nav>
@@ -84,12 +84,33 @@
       </div>
     </a>
 
+    <a class="card card-star" href="/limpieza">
+      <div class="card-star-badge">🧼 Nuevo</div>
+      <div class="card-icon">🧼</div>
+      <h3>Quitar fondo y limpiar</h3>
+      <p>
+        Elimina fondos, reduce ruido y binariza tus croquis o escaneos
+        antes de convertirlos. Ideal para lineas finas y papel sucio.
+      </p>
+      <ul class="card-features">
+        <li>✓ Quita fondo automático</li>
+        <li>✓ Reducción de ruido</li>
+        <li>✓ Binarización adaptativa</li>
+        <li>✓ Exporta PNG limpio</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">PNG</span>
+        <span class="tag tag-free">GRATIS</span>
+        <span class="tag">Preproceso</span>
+      </div>
+    </a>
+
     <a class="card card-star" href="/texto">
       <div class="card-star-badge new">✨ Nuevo</div>
       <div class="card-icon">✏️</div>
       <h3>Texto → DXF</h3>
       <p>
-        Describe tu vivienda en español y ArqGen genera el plano completo
+        Describe tu vivienda en español y Lu CAD Studio genera el plano completo
         automáticamente. Sin conocer CAD. Sin parámetros técnicos.
       </p>
       <ul class="card-features">
@@ -164,19 +185,22 @@
       </div>
     </div>
 
-    <a class="card" href="/carpinteria">
-      <div class="card-icon">🚪</div>
-      <h3>Carpintería / Cancelería</h3>
+    <div class="card card-coming-soon">
+      <div class="coming-soon-ribbon">En desarrollo</div>
+      <div class="card-icon" style="opacity:.45">🚪</div>
+      <h3>Carpintería / Cancelería <span class="pro-badge">PRO</span></h3>
       <p>
         Alzados técnicos de ventanas, puertas y closets con cotas,
         despiece de piezas y catálogo de materiales.
       </p>
-      <div class="tags">
+      <div class="coming-soon-bar"><div class="coming-soon-progress" style="width:15%"></div></div>
+      <p class="coming-soon-pct">15% completado</p>
+      <div class="tags" style="opacity:.4">
         <span class="tag">DXF</span>
         <span class="tag">PDF A3</span>
         <span class="tag">Aluminio · Madera · PVC</span>
       </div>
-    </a>
+    </div>
 
   </div>
 
@@ -207,8 +231,8 @@
         <div class="plan-price">$0 <span>/ siempre</span></div>
         <ul class="plan-features">
           <li>✓ Imagen → DXF (ilimitado)</li>
+          <li>✓ Quitar fondo y limpiar</li>
           <li>✓ Texto → DXF</li>
-          <li>✓ Carpintería básica</li>
           <li>✓ API REST pública</li>
           <li class="disabled">— Planta arquitectónica</li>
           <li class="disabled">— Cimentación y armado</li>
@@ -251,8 +275,9 @@
 </div>
 
 <footer>
-  <strong>ArqGen</strong> — lucadstudio.com &nbsp;|&nbsp;
+  <strong>Lu CAD Studio</strong> — lucadstudio.com &nbsp;|&nbsp;
   <a href="/imagen" style="color:var(--accent2)">Imagen→DXF</a> &nbsp;|&nbsp;
+  <a href="/limpieza" style="color:var(--accent2)">Quitar fondo</a> &nbsp;|&nbsp;
   <a href="/texto" style="color:var(--accent2)">Texto→DXF</a> &nbsp;|&nbsp;
   <a href="/privacidad" style="color:var(--accent2)">Privacidad</a> &nbsp;|&nbsp;
   <a href="/docs" style="color:var(--accent2)">API</a>

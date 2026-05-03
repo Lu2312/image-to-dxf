@@ -47,6 +47,7 @@ class ImagenResult:
 @dataclass
 class ImagenParams:
     image_bytes:    bytes           # contenido del archivo de imagen
+    content_type:   str  = ""       # image/* o application/pdf
     mode:           str  = "trace"  # trace | hatch | pixel
     scale:          float = 0.1     # mm/px  (0.1 → 1 px = 0.1 mm)
     threshold:      int   = 127     # 0–255  umbral de binarización
@@ -58,13 +59,40 @@ class ImagenParams:
     layer_contour:  str   = "CONTORNOS"
     layer_hatch:    str   = "RELLENOS"
     layer_pixel:    str   = "PIXELES"
+    pre_clean:      bool  = False   # limpieza de ruido
+    bg_remove:      bool  = False   # remover fondo
+    adaptive:       bool  = False   # binarización adaptativa
+    invert:         bool  = True    # invertir (fondo blanco, líneas negras)
+    denoise_ksize:  int   = 3       # kernel mediano (impar)
+    morph_open:     int   = 0       # apertura morfológica
+    morph_close:    int   = 0       # cierre morfológico
+    pdf_dpi:        int   = 200     # rasterizado PDF
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _load_gray_from_bytes(data: bytes) -> np.ndarray:
+def _pdf_first_page_to_gray(data: bytes, dpi: int) -> np.ndarray:
+    try:
+        import fitz  # PyMuPDF
+    except Exception as exc:
+        raise ValueError("PyMuPDF no esta instalado para leer PDFs.") from exc
+
+    doc = fitz.open(stream=data, filetype="pdf")
+    try:
+        page = doc.load_page(0)
+        pix = page.get_pixmap(dpi=dpi, colorspace=fitz.csGRAY, alpha=False)
+        gray = np.frombuffer(pix.samples, np.uint8).reshape(pix.height, pix.width)
+        return gray
+    finally:
+        doc.close()
+
+
+def _load_gray_from_bytes(data: bytes, content_type: str, pdf_dpi: int) -> np.ndarray:
+    if content_type == "application/pdf":
+        return _pdf_first_page_to_gray(data, pdf_dpi)
+
     arr = np.frombuffer(data, np.uint8)
     gray = cv2.imdecode(arr, cv2.IMREAD_GRAYSCALE)
     if gray is None:
@@ -72,8 +100,34 @@ def _load_gray_from_bytes(data: bytes) -> np.ndarray:
     return gray
 
 
-def _threshold_img(gray: np.ndarray, thr: int) -> np.ndarray:
-    _, binary = cv2.threshold(gray, thr, 255, cv2.THRESH_BINARY_INV)
+def _odd_ksize(value: int) -> int:
+    if value < 3:
+        return 0
+    return value if value % 2 == 1 else value + 1
+
+
+def _preprocess(gray: np.ndarray, p: ImagenParams) -> np.ndarray:
+    img = gray
+    if p.bg_remove:
+        blur = cv2.GaussianBlur(img, (0, 0), sigmaX=15)
+        img = cv2.divide(img, blur, scale=255)
+    if p.pre_clean:
+        k = _odd_ksize(p.denoise_ksize)
+        if k:
+            img = cv2.medianBlur(img, k)
+    return img
+
+
+def _threshold_img(gray: np.ndarray, thr: int, adaptive: bool, invert: bool) -> np.ndarray:
+    mode = cv2.THRESH_BINARY_INV if invert else cv2.THRESH_BINARY
+    if adaptive:
+        block = 31
+        binary = cv2.adaptiveThreshold(
+            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, mode, block, 2
+        )
+        return binary
+
+    _, binary = cv2.threshold(gray, thr, 255, mode)
     return binary
 
 
@@ -108,7 +162,7 @@ def _add_info_block(msp, title: str, img_w: int, img_h: int,
         f"Dimensiones imagen: {img_w} x {img_h} px",
         f"Escala: 1 px = {scale} mm",
         f"Tamano DXF: {img_w*scale:.1f} x {img_h*scale:.1f} mm",
-        "Generado con ArqGen | arqgen.io",
+        "Generado con Lu CAD Studio | lucadstudio.com",
     ]
     for i, line in enumerate(lines):
         msp.add_text(line, dxfattribs={
@@ -124,9 +178,18 @@ def _add_info_block(msp, title: str, img_w: int, img_h: int,
 class ImagenGenerator:
 
     def generate(self, p: ImagenParams) -> ImagenResult:
-        gray   = _load_gray_from_bytes(p.image_bytes)
+        gray = _load_gray_from_bytes(p.image_bytes, p.content_type, p.pdf_dpi)
+        gray = _preprocess(gray, p)
         img_h, img_w = gray.shape
-        binary = _threshold_img(gray, p.threshold)
+        binary = _threshold_img(gray, p.threshold, p.adaptive, p.invert)
+        if p.morph_open > 0:
+            k = _odd_ksize(p.morph_open) or 3
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (k, k))
+            binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        if p.morph_close > 0:
+            k = _odd_ksize(p.morph_close) or 3
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (k, k))
+            binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
 
         doc = ezdxf.new("R2010")
         doc.header["$INSUNITS"]    = 4
@@ -145,6 +208,7 @@ class ImagenGenerator:
 
         mode = p.mode.lower()
 
+        contours: List[np.ndarray] = []
         if mode == "pixel":
             rows, cols = np.where(binary == 255)
             s = p.scale
@@ -186,8 +250,7 @@ class ImagenGenerator:
         dxf_bytes = buf.getvalue().encode("utf-8")
 
         entity_count = sum(1 for _ in msp)
-        n_cont = 0 if mode == "pixel" else len(
-            _find_contours(binary, p.min_area, p.approx_epsilon))
+        n_cont = 0 if mode == "pixel" else len(contours)
 
         return ImagenResult(
             dxf_bytes     = dxf_bytes,
@@ -199,3 +262,25 @@ class ImagenGenerator:
             dxf_height_mm = img_h * p.scale,
             mode          = p.mode,
         )
+
+
+def clean_image_bytes(p: ImagenParams) -> bytes:
+    """
+    Preprocesa la imagen y devuelve un PNG binario (limpio) para vista previa.
+    """
+    gray = _load_gray_from_bytes(p.image_bytes, p.content_type, p.pdf_dpi)
+    gray = _preprocess(gray, p)
+    binary = _threshold_img(gray, p.threshold, p.adaptive, p.invert)
+    if p.morph_open > 0:
+        k = _odd_ksize(p.morph_open) or 3
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (k, k))
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+    if p.morph_close > 0:
+        k = _odd_ksize(p.morph_close) or 3
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (k, k))
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+
+    ok, buf = cv2.imencode(".png", binary)
+    if not ok:
+        raise ValueError("No se pudo generar la imagen limpia.")
+    return buf.tobytes()

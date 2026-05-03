@@ -8,14 +8,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from io import BytesIO
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
+from PIL import Image
+from rembg import remove
 
-from backend.routers.router_cimentacion import router as r_cim
-from backend.routers.router_planta       import router as r_pla
-from backend.routers.router_carpinteria  import router as r_car
 from backend.routers.router_texto        import router as r_txt
 from backend.routers.router_imagen       import router as r_img
 
@@ -44,9 +45,6 @@ TEMPLATES = BASE / "frontend" / "templates"
 app.mount("/static", StaticFiles(directory=BASE / "frontend" / "static"), name="static")
 
 # Routers
-app.include_router(r_cim)
-app.include_router(r_pla)
-app.include_router(r_car)
 app.include_router(r_txt)
 app.include_router(r_img)
 
@@ -60,21 +58,6 @@ def home():
     return FileResponse(TEMPLATES / "index.html")
 
 
-@app.get("/cimentacion", response_class=FileResponse)
-def page_cimentacion():
-    return FileResponse(TEMPLATES / "cimentacion.html")
-
-
-@app.get("/planta", response_class=FileResponse)
-def page_planta():
-    return FileResponse(TEMPLATES / "planta.html")
-
-
-@app.get("/carpinteria", response_class=FileResponse)
-def page_carpinteria():
-    return FileResponse(TEMPLATES / "carpinteria.html")
-
-
 @app.get("/texto", response_class=FileResponse)
 def page_texto():
     return FileResponse(TEMPLATES / "texto.html")
@@ -85,6 +68,11 @@ def page_imagen():
     return FileResponse(TEMPLATES / "imagen.html")
 
 
+@app.get("/limpieza", response_class=FileResponse)
+def page_limpieza():
+    return FileResponse(TEMPLATES / "limpieza.html")
+
+
 @app.get("/privacidad", response_class=FileResponse)
 def page_privacidad():
     return FileResponse(TEMPLATES / "privacidad.html")
@@ -93,3 +81,24 @@ def page_privacidad():
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "arqgen"}
+
+
+@app.post("/remove-bg")
+async def remove_background(file: UploadFile = File(..., description="Imagen PNG/JPG/BMP/TIFF")):
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(400, "Solo se aceptan archivos de imagen.")
+
+    image_bytes = await file.read()
+    if len(image_bytes) > 20 * 1024 * 1024:
+        raise HTTPException(413, "Imagen demasiado grande (máx. 20 MB).")
+
+    try:
+        # rembg devuelve PNG con canal alfa
+        result = remove(image_bytes)
+        img = Image.open(BytesIO(result))
+        out = BytesIO()
+        img.save(out, format="PNG")
+    except Exception as e:
+        raise HTTPException(422, f"No se pudo quitar el fondo: {e}")
+
+    return Response(content=out.getvalue(), media_type="image/png")

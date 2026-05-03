@@ -181,7 +181,7 @@ def add_title_block(
     _t(date,        x + pad,       y + H * 0.07, 3.5)
     _t("HOJA:",     x + mid + pad, y + H * 0.20, 2.5)
     _t(sheet,       x + mid + pad, y + H * 0.07, 3.5)
-    _t("Generado bajo NTC-RCDF / CONAVI | arqgen.io",
+    _t("Generado bajo NTC-RCDF / CONAVI | lucadstudio.com",
        x + pad, y + H * 0.01, 1.8)
 
 

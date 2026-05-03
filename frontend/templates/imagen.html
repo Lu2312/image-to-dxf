@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Imagen a DXF — ArqGen</title>
-  
+  <title>Imagen a DXF — Lu CAD Studio</title>
+
   <!-- Google AdSense -->
   <meta name="google-adsense-account" content="ca-pub-3833242390185896">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3833242390185896"
      crossorigin="anonymous"></script>
-  
+
   <link rel="stylesheet" href="/static/css/arqgen.css"/>
   <style>
     .drop-zone {
@@ -35,19 +35,17 @@
 </head>
 <body>
 <nav>
-  <a class="nav-brand" href="/">Arq<span>Gen</span></a>
-  <a href="/cimentacion">Cimentación</a>
-  <a href="/planta">Planta</a>
-  <a href="/carpinteria">Carpintería</a>
-  <a href="/texto">Texto→DXF</a>
+  <a class="nav-brand" href="/">Lu CAD Studio</a>
   <a href="/imagen" class="active">Imagen→DXF</a>
+  <a href="/limpieza">Quitar fondo</a>
+  <a href="/texto">Texto→DXF</a>
   <a href="/docs" target="_blank">API</a>
 </nav>
 
 <div class="container">
   <h1 style="margin-bottom:.5rem">🖼️ Imagen → DXF</h1>
   <p style="color:var(--muted);margin-bottom:1.5rem">
-    Sube un croquis, plano o imagen cualquiera y conviértelo a entidades DXF
+    Sube un croquis, plano o imagen cualquiera y conviertelo a entidades DXF
     (LWPOLYLINE, HATCH o SOLID) listas para AutoCAD.
   </p>
 
@@ -55,78 +53,150 @@
 
     <!-- FORM -->
     <div class="panel">
-      <h2>Configuración</h2>
+      <h2>Configuracion</h2>
 
       <!-- Drop zone -->
       <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-        <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(event)"/>
+        <input type="file" id="file-input" accept="image/*,application/pdf" onchange="onFileSelected(event)"/>
         <div id="drop-label">
           <div style="font-size:2.5rem;margin-bottom:.5rem">📂</div>
-          <strong>Haz clic o arrastra una imagen aquí</strong>
-          <p style="color:var(--muted);font-size:.85rem;margin-top:.3rem">PNG, JPG, BMP, TIFF — máx. 20 MB</p>
+          <strong>Haz clic o arrastra una imagen aqui</strong>
+          <p style="color:var(--muted);font-size:.85rem;margin-top:.3rem">PNG, JPG, BMP, TIFF, PDF — max. 20 MB</p>
         </div>
         <img id="thumb-preview" alt="preview"/>
       </div>
 
       <div id="file-info" style="display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted)"></div>
-
-      <!-- Opciones -->
-      <div class="form-row" style="margin-top:1.25rem">
-        <div class="form-group">
-          <label>Modo de conversión</label>
-          <select id="mode">
-            <option value="trace" selected>Trace — contornos LWPOLYLINE</option>
-            <option value="hatch">Hatch — rellenos HATCH SOLID</option>
-            <option value="pixel">Pixel — SOLID por píxel (solo imágenes pequeñas)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Escala (mm/px)</label>
-          <input id="scale" type="number" value="0.1" min="0.01" max="100" step="0.01"/>
-        </div>
+      <div id="bg-actions" style="display:none;gap:.5rem;margin-top:.75rem">
+        <button class="btn-secondary" id="remove-bg-btn" onclick="doRemoveBg()">🪄 Quitar fondo</button>
+        <span id="remove-bg-note" style="color:var(--muted);font-size:.82rem"></span>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>Umbral binarización (0–255)</label>
-          <input id="threshold" type="range" min="0" max="255" value="127"
-            oninput="document.getElementById('thr-val').textContent=this.value"/>
-          <small style="color:var(--muted)">Valor: <span id="thr-val">127</span></small>
+      <div id="imagen-tabs" class="preview-pane" style="margin-top:1.25rem">
+        <div class="preview-tabs">
+          <button class="tab-btn active" data-tab="tab-conversion">Conversion</button>
+          <button class="tab-btn" data-tab="tab-mueble3d">PDF → 3D (en desarrollo)</button>
         </div>
-        <div class="form-group">
-          <label>Área mínima de contorno (px²)</label>
-          <input id="min_area" type="number" value="10" min="0" max="5000" step="1"/>
-        </div>
-      </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>Simplificación D-P (epsilon, px)</label>
-          <input id="approx_epsilon" type="number" value="0.5" min="0" max="20" step="0.1"/>
-        </div>
-        <div class="form-group">
-          <label>Título del plano</label>
-          <input id="title" value="" placeholder="(opcional)"/>
-        </div>
-      </div>
+        <div id="tab-conversion" class="tab-content active">
+          <div class="form-row" style="margin-top:.5rem">
+            <div class="form-group">
+              <label>Modo de conversion</label>
+              <select id="mode">
+                <option value="trace" selected>Trace — contornos LWPOLYLINE</option>
+                <option value="hatch">Hatch — rellenos HATCH SOLID</option>
+                <option value="pixel">Pixel — SOLID por pixel (solo imagenes pequenas)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Escala (mm/px)</label>
+              <input id="scale" type="number" value="0.1" min="0.01" max="100" step="0.01"/>
+            </div>
+          </div>
 
-      <div class="form-group" style="margin-top:.5rem">
-        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
-          <input id="spline" type="checkbox" style="width:auto"/>
-          Usar SPLINE en vez de LWPOLYLINE (solo modo trace)
-        </label>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Umbral binarizacion (0–255)</label>
+              <input id="threshold" type="range" min="0" max="255" value="127"
+                oninput="document.getElementById('thr-val').textContent=this.value"/>
+              <small style="color:var(--muted)">Valor: <span id="thr-val">127</span></small>
+            </div>
+            <div class="form-group">
+              <label>Area minima de contorno (px2)</label>
+              <input id="min_area" type="number" value="10" min="0" max="5000" step="1"/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Simplificacion D-P (epsilon, px)</label>
+              <input id="approx_epsilon" type="number" value="0.5" min="0" max="20" step="0.1"/>
+            </div>
+            <div class="form-group">
+              <label>Titulo del plano</label>
+              <input id="title" value="" placeholder="(opcional)"/>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:.5rem">
+            <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+              <input id="spline" type="checkbox" style="width:auto"/>
+              Usar SPLINE en vez de LWPOLYLINE (solo modo trace)
+            </label>
+          </div>
+        </div>
+
+        <div id="tab-mueble3d" class="tab-content">
+          <div class="panel" style="background:var(--surface-alt);padding:1rem;border-radius:6px">
+            <strong style="color:var(--accent2)">En desarrollo</strong>
+            <p style="color:var(--muted);font-size:.85rem;margin:.35rem 0 0">
+              PDF → modelo 3D estara disponible en una proxima version.
+            </p>
+          </div>
+
+          <div style="opacity:.45;pointer-events:none">
+            <h3 style="margin-top:1.25rem">Mueble 3D desde PDF</h3>
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:.75rem">
+              Convierte un PDF con vista isometrica a DXF 3D con placas extruidas.
+            </p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ancho total (mm)</label>
+                <input id="m3d_width" type="number" value="800" min="0" max="5000" step="1" disabled/>
+              </div>
+              <div class="form-group">
+                <label>Alto total (mm)</label>
+                <input id="m3d_height" type="number" value="600" min="0" max="5000" step="1" disabled/>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Fondo total (mm)</label>
+                <input id="m3d_depth" type="number" value="300" min="0" max="5000" step="1" disabled/>
+              </div>
+              <div class="form-group">
+                <label>Espesor (mm)</label>
+                <input id="m3d_thickness" type="number" value="19" min="1" max="500" step="1" disabled/>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                  <input id="m3d_use_ocr" type="checkbox" style="width:auto" checked disabled/>
+                  Usar OCR para cotas (si el ancho/alto/fondo estan en 0)
+                </label>
+              </div>
+              <div class="form-group">
+                <label>OCR idioma</label>
+                <input id="m3d_ocr_lang" type="text" value="spa" disabled/>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem">
+              <button class="btn-primary" disabled>🧱 Generar DXF 3D</button>
+              <button class="btn-secondary" disabled>👁️ Previsualizar 3D</button>
+              <button class="btn-secondary" disabled>📋 Lista de corte</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem">
-        <button class="btn-primary" onclick="doInfo()">🔍 Previsualizar estadísticas</button>
+        <button class="btn-primary" onclick="doInfo()">🔍 Previsualizar estadisticas</button>
         <button class="btn-secondary" id="btn-dl" onclick="doDownload()" style="display:none">⬇ Descargar DXF</button>
       </div>
 
-      <!-- Estadísticas -->
+      <!-- Estadisticas -->
       <div id="stats-box" style="display:none;margin-top:1.5rem">
         <h3 style="color:var(--accent2);font-size:.9rem;margin-bottom:.5rem">Resultado</h3>
         <div id="stats-content" class="stat-grid"></div>
       </div>
+
+      <div id="mueble3d-preview" style="display:none;margin-top:1rem;background:var(--surface-alt);border-radius:6px;padding:.75rem"></div>
+      <div id="mueble3d-notes" style="display:none;margin-top:.5rem;color:var(--muted);font-size:.85rem"></div>
+      <div id="mueble3d-cutlist" style="display:none;margin-top:1rem"></div>
     </div>
 
     <!-- PREVIEW (imagen original escalada) -->
@@ -135,7 +205,7 @@
       <div id="img-area" style="width:100%;min-height:400px;display:flex;
            align-items:center;justify-content:center;background:var(--surface-alt);
            border-radius:6px;overflow:auto">
-        <span style="color:var(--muted);font-size:.9rem">La imagen seleccionada aparecerá aquí</span>
+        <span style="color:var(--muted);font-size:.9rem">La imagen seleccionada aparecera aqui</span>
       </div>
       <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">
         La vista previa DXF solo es visible al abrir el archivo en AutoCAD / LibreCAD / BricsCAD.
@@ -146,7 +216,7 @@
 </div>
 
 <footer>
-  <strong>ArqGen</strong> — Generador paramétrico bajo NTC-RCDF &nbsp;|&nbsp;
+  <strong>Lu CAD Studio</strong> — Generador parametrico bajo NTC-RCDF &nbsp;|&nbsp;
   <a href="/docs" style="color:var(--accent2)">API Docs</a>
 </footer>
 
@@ -156,14 +226,16 @@ let selectedFile = null;
 
 // Drag & drop
 const dz = document.getElementById("drop-zone");
-dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag-over"); });
-dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
-dz.addEventListener("drop", e => {
-  e.preventDefault(); dz.classList.remove("drag-over");
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith("image/")) loadFile(f);
-  else alert("Solo se aceptan archivos de imagen.");
-});
+if (dz) {
+  dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag-over"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("drag-over");
+    const f = e.dataTransfer.files[0];
+    if (f && (f.type.startsWith("image/") || f.type === "application/pdf")) loadFile(f);
+    else alert("Solo se aceptan archivos de imagen o PDF.");
+  });
+}
 
 function onFileSelected(evt) {
   const f = evt.target.files[0];
@@ -181,16 +253,91 @@ function loadFile(f) {
   const info = document.getElementById("file-info");
   info.textContent = `${f.name}  (${(f.size/1024).toFixed(1)} KB)`;
   info.style.display = "block";
+  // Remove bg action
+  const bgActions = document.getElementById("bg-actions");
+  const bgBtn = document.getElementById("remove-bg-btn");
+  const bgNote = document.getElementById("remove-bg-note");
+  if (f.type.startsWith("image/")) {
+    bgActions.style.display = "flex";
+    bgBtn.disabled = false;
+    bgNote.textContent = "";
+  } else {
+    bgActions.style.display = "none";
+    bgNote.textContent = "";
+  }
   // Preview panel
   const area = document.getElementById("img-area");
-  area.innerHTML = `<img src="${url}" style="max-width:100%;max-height:500px;border-radius:4px" alt="preview"/>`;
+  if (f.type === "application/pdf") {
+    area.innerHTML = `<div style="text-align:center;color:var(--muted)">PDF cargado<br/><small>Se rasteriza la primera pagina al convertir</small></div>`;
+  } else {
+    area.innerHTML = `<img src="${url}" style="max-width:100%;max-height:500px;border-radius:4px" alt="preview"/>`;
+  }
   // Reset stats
   document.getElementById("stats-box").style.display = "none";
   document.getElementById("btn-dl").style.display = "none";
+  const prev = document.getElementById("mueble3d-preview");
+  const notes = document.getElementById("mueble3d-notes");
+  const cutlist = document.getElementById("mueble3d-cutlist");
+  if (prev) { prev.style.display = "none"; prev.innerHTML = ""; }
+  if (notes) { notes.style.display = "none"; notes.textContent = ""; }
+  if (cutlist) { cutlist.style.display = "none"; cutlist.innerHTML = ""; }
+}
+
+async function doRemoveBg() {
+  if (!selectedFile) { alert("Primero selecciona una imagen."); return; }
+  if (!selectedFile.type.startsWith("image/")) {
+    alert("La funcion Quitar fondo solo acepta imagenes.");
+    return;
+  }
+
+  const btn = document.getElementById("remove-bg-btn");
+  const note = document.getElementById("remove-bg-note");
+  btn.disabled = true;
+  note.textContent = "Procesando...";
+
+  const fd = new FormData();
+  fd.append("file", selectedFile);
+
+  try {
+    const res = await fetch("/remove-bg", { method: "POST", body: fd });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || "Error al quitar fondo.");
+    }
+    const blob = await res.blob();
+    const stem = (selectedFile.name || "imagen").replace(/\.[^.]+$/, "");
+    const cleanFile = new File([blob], `${stem}_no_bg.png`, { type: "image/png" });
+    selectedFile = cleanFile;
+
+    const url = URL.createObjectURL(blob);
+    const thumb = document.getElementById("thumb-preview");
+    thumb.src = url;
+    thumb.style.display = "block";
+
+    const area = document.getElementById("img-area");
+    area.innerHTML = `<img src="${url}" style="max-width:100%;max-height:500px;border-radius:4px" alt="preview"/>`;
+
+    const info = document.getElementById("file-info");
+    info.textContent = `${cleanFile.name}  (${(cleanFile.size/1024).toFixed(1)} KB) — fondo removido`;
+    note.textContent = "Listo. Se usara esta imagen para el DXF.";
+  } catch (e) {
+    note.textContent = e.message || "Error al quitar fondo.";
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function buildFormData() {
   const fd = new FormData();
+  // Valores de preproceso fijos para la conversion
+  const preClean = "false";
+  const bgRemove = "false";
+  const adaptive = "false";
+  const invert = "true";
+  const denoiseK = "3";
+  const morphOpen = "0";
+  const morphClose = "0";
+  const pdfDpi = "200";
   fd.append("file",           selectedFile);
   fd.append("mode",           document.getElementById("mode").value);
   fd.append("scale",          document.getElementById("scale").value);
@@ -199,6 +346,27 @@ function buildFormData() {
   fd.append("approx_epsilon", document.getElementById("approx_epsilon").value);
   fd.append("spline",         document.getElementById("spline").checked ? "true" : "false");
   fd.append("title",          document.getElementById("title").value);
+  fd.append("pre_clean",      preClean);
+  fd.append("bg_remove",      bgRemove);
+  fd.append("adaptive",       adaptive);
+  fd.append("invert",         invert);
+  fd.append("denoise_ksize",  denoiseK);
+  fd.append("morph_open",     morphOpen);
+  fd.append("morph_close",    morphClose);
+  fd.append("pdf_dpi",        pdfDpi);
+  return fd;
+}
+
+function buildMueble3DFormData() {
+  const fd = new FormData();
+  fd.append("file",       selectedFile);
+  fd.append("width",      document.getElementById("m3d_width").value);
+  fd.append("height",     document.getElementById("m3d_height").value);
+  fd.append("depth",      document.getElementById("m3d_depth").value);
+  fd.append("thickness",  document.getElementById("m3d_thickness").value);
+  fd.append("use_ocr",    document.getElementById("m3d_use_ocr").checked ? "true" : "false");
+  fd.append("ocr_lang",   document.getElementById("m3d_ocr_lang").value);
+  fd.append("pdf_dpi",    "200");
   return fd;
 }
 
@@ -207,7 +375,16 @@ async function doInfo() {
   const fd = buildFormData();
   try {
     const res = await fetch("/api/imagen/info", { method: "POST", body: fd });
-    if (!res.ok) { const err = await res.json(); alert(err.detail || "Error"); return; }
+    if (!res.ok) {
+      const errText = await res.text();
+      try {
+        const err = JSON.parse(errText);
+        alert(err.detail || "Error");
+      } catch {
+        alert(errText || "Error");
+      }
+      return;
+    }
     const d = await res.json();
     const grid = document.getElementById("stats-content");
     grid.innerHTML = [
@@ -215,11 +392,11 @@ async function doInfo() {
       ["Contornos",       d.contour_count],
       ["Entidades DXF",   d.entity_count],
       ["Imagen (px)",     `${d.img_width} × ${d.img_height}`],
-      ["Tamaño DXF (mm)", `${d.dxf_width_mm?.toFixed(1)} × ${d.dxf_height_mm?.toFixed(1)}`],
+      ["Tamano DXF (mm)", `${d.dxf_width_mm?.toFixed(1)} × ${d.dxf_height_mm?.toFixed(1)}`],
     ].map(([k,v]) => `<div class="stat-item">${k}<br><span>${v}</span></div>`).join("");
     document.getElementById("stats-box").style.display = "block";
     document.getElementById("btn-dl").style.display = "inline-flex";
-  } catch(e) { alert("Error de conexión: " + e.message); }
+  } catch(e) { alert("Error de conexion: " + e.message); }
 }
 
 async function doDownload() {
@@ -227,9 +404,18 @@ async function doDownload() {
   const fd = buildFormData();
   try {
     const res = await fetch("/api/imagen/dxf", { method: "POST", body: fd });
-    if (!res.ok) { const err = await res.json(); alert(err.detail || "Error"); return; }
+    if (!res.ok) {
+      const errText = await res.text();
+      try {
+        const err = JSON.parse(errText);
+        alert(err.detail || "Error");
+      } catch {
+        alert(errText || "Error");
+      }
+      return;
+    }
     const blob = await res.blob();
-    const stem = selectedFile.name.replace(/\.[^.]+$/,"");
+    const stem = selectedFile.name.replace(/\.[^.]+$/, "");
     const mode = document.getElementById("mode").value;
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -237,6 +423,107 @@ async function doDownload() {
     a.click();
   } catch(e) { alert("Error: " + e.message); }
 }
+
+async function doMueble3D() {
+  if (!selectedFile) { alert("Primero selecciona un PDF."); return; }
+  if (selectedFile.type !== "application/pdf") {
+    alert("La herramienta 3D solo acepta PDFs.");
+    return;
+  }
+  const fd = buildMueble3DFormData();
+  try {
+    const res = await fetch("/api/imagen/mueble3d", { method: "POST", body: fd });
+    if (!res.ok) {
+      const errText = await res.text();
+      try {
+        const err = JSON.parse(errText);
+        alert(err.detail || "Error");
+      } catch {
+        alert(errText || "Error");
+      }
+      return;
+    }
+    const blob = await res.blob();
+    const stem = selectedFile.name.replace(/\.[^.]+$/, "");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${stem}_mueble3d.dxf`;
+    a.click();
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+async function doMueble3DPreview() {
+  if (!selectedFile) { alert("Primero selecciona un PDF."); return; }
+  if (selectedFile.type !== "application/pdf") {
+    alert("La herramienta 3D solo acepta PDFs.");
+    return;
+  }
+  const fd = buildMueble3DFormData();
+  try {
+    const res = await fetch("/api/imagen/mueble3d/preview", { method: "POST", body: fd });
+    if (!res.ok) {
+      const errText = await res.text();
+      try {
+        const err = JSON.parse(errText);
+        alert(err.detail || "Error");
+      } catch {
+        alert(errText || "Error");
+      }
+      return;
+    }
+    const data = await res.json();
+    const prev = document.getElementById("mueble3d-preview");
+    const notes = document.getElementById("mueble3d-notes");
+    prev.innerHTML = data.svg || "";
+    prev.style.display = "block";
+    if (data.notes && data.notes.length) {
+      notes.textContent = data.notes.join(" | ");
+      notes.style.display = "block";
+    } else {
+      notes.style.display = "none";
+      notes.textContent = "";
+    }
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+async function doMueble3DCutlist() {
+  if (!selectedFile) { alert("Primero selecciona un PDF."); return; }
+  if (selectedFile.type !== "application/pdf") {
+    alert("La herramienta 3D solo acepta PDFs.");
+    return;
+  }
+  const fd = new FormData();
+  fd.append("file", selectedFile);
+  fd.append("ocr_lang", document.getElementById("m3d_ocr_lang").value || "spa");
+  fd.append("pdf_dpi", "200");
+  try {
+    const res = await fetch("/api/imagen/mueble3d/cutlist", { method: "POST", body: fd });
+    if (!res.ok) {
+      const errText = await res.text();
+      try {
+        const err = JSON.parse(errText);
+        alert(err.detail || "Error");
+      } catch {
+        alert(errText || "Error");
+      }
+      return;
+    }
+    const data = await res.json();
+    const cutlist = document.getElementById("mueble3d-cutlist");
+    const items = data.items || [];
+    if (!items.length) {
+      cutlist.innerHTML = `<div style="color:var(--muted)">No se detectaron piezas.</div>`;
+      cutlist.style.display = "block";
+      return;
+    }
+    const rows = items.map(i => `<tr><td>${i.idx}</td><td>${i.name}</td><td>${i.length}</td><td>${i.width}</td><td>${i.qty}</td></tr>`).join("");
+    cutlist.innerHTML = `<table class="catalog-table"><thead><tr><th>#</th><th>Nombre</th><th>Largo</th><th>Ancho</th><th>Cant.</th></tr></thead><tbody>${rows}</tbody></table>`;
+    cutlist.style.display = "block";
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+const tabWrap = document.getElementById("imagen-tabs");
+if (tabWrap && typeof initTabs === "function") { initTabs(tabWrap); }
 </script>
 </body>
 </html>

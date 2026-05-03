@@ -67,7 +67,7 @@ class CatalogoConceptos:
         ws["A1"].alignment = Alignment(horizontal="center")
 
         ws.merge_cells("A2:F2")
-        ws["A2"] = "Generado bajo NTC-RCDF  |  arqgen.io"
+        ws["A2"] = "Generado bajo NTC-RCDF  |  lucadstudio.com"
         ws["A2"].font = Font(italic=True, size=9, color="666666")
         ws["A2"].alignment = Alignment(horizontal="center")
 

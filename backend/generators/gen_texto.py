@@ -92,7 +92,7 @@ class TextoParseResult:
     lote_fondo:   float = 15000.0  # mm
     espesor_muro: float = 150.0    # mm
     altura_muro:  float = 2700.0   # mm
-    project_name: str   = "Proyecto ArqGen"
+    project_name: str   = "Proyecto Lu CAD Studio"
     date:         str   = "2026"
     recintos:     List[Dict] = field(default_factory=list)
     notas:        List[str]  = field(default_factory=list)   # advertencias
@@ -165,7 +165,7 @@ def _make_recinto(tipo: str, index: int = 0) -> Dict:
     return {"nombre": label, "ancho": ancho, "fondo": fondo}
 
 
-def parse_texto(text: str, project_name: str = "Proyecto ArqGen",
+def parse_texto(text: str, project_name: str = "Proyecto Lu CAD Studio",
                 date: str = "2026") -> TextoParseResult:
     """
     Convierte texto libre en español a un TextoParseResult con programa

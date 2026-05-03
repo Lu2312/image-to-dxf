@@ -19,7 +19,7 @@ class TextoRequest(BaseModel):
     texto:        str = Field(..., min_length=10,
                               example="Casa de 3 recamaras, sala-comedor, cocina, "
                                       "2 banos, patio de servicio, lote 8x15 m")
-    project_name: str = Field("Proyecto ArqGen", max_length=80)
+    project_name: str = Field("Proyecto Lu CAD Studio", max_length=80)
 
 
 def _build_params(req: TextoRequest) -> tuple[PlantaParams, list]:

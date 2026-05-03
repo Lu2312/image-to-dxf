@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Quitar fondo — Lu CAD Studio</title>
+
+  <!-- Google AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-3833242390185896">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3833242390185896"
+     crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+  <style>
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .drop-zone.drag-over, .drop-zone:hover {
+      border-color: var(--accent);
+      background: rgba(47,117,182,.08);
+    }
+    .drop-zone input[type=file] { display:none; }
+    #clean-preview { max-width:100%; max-height:420px; border-radius:6px;
+                     margin-top:1rem; display:none; }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">Lu CAD Studio</a>
+  <a href="/imagen">Imagen→DXF</a>
+  <a href="/limpieza" class="active">Quitar fondo</a>
+  <a href="/texto">Texto→DXF</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="container">
+  <h1 style="margin-bottom:.5rem">� Quitar fondo</h1>
+  <p style="color:var(--muted);margin-bottom:1.5rem">
+    Sube cualquier imagen y elimina el fondo automaticamente con IA (rembg / U2Net).
+    Descarga el PNG transparente o convierte directamente a DXF.
+  </p>
+
+  <div class="tool-layout">
+
+    <div class="panel">
+      <h2>Sube tu imagen</h2>
+
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(event)"/>
+        <div id="drop-label">
+          <div style="font-size:2.5rem;margin-bottom:.5rem">📂</div>
+          <strong>Haz clic o arrastra una imagen aqui</strong>
+          <p style="color:var(--muted);font-size:.85rem;margin-top:.3rem">PNG, JPG, BMP, TIFF — max. 20 MB</p>
+        </div>
+        <img id="thumb-before" alt="original" style="max-width:100%;max-height:220px;border-radius:6px;margin-top:1rem;display:none"/>
+      </div>
+
+      <div id="file-info" style="display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted)"></div>
+
+      <button class="btn-primary" id="btn-remove" style="margin-top:1rem" onclick="doRemoveBg()" disabled>🪄 Quitar fondo</button>
+
+      <p style="font-size:.82rem;color:var(--muted);margin-top:.75rem">
+        Usa IA (U2Net / rembg) para detectar y eliminar el fondo — sin ajustes manuales.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Resultado</h2>
+      <div id="status" style="color:var(--muted);font-size:.85rem">Sube una imagen para ver el resultado.</div>
+
+      <!-- checkerboard background to show transparency -->
+      <div id="preview-wrap" style="display:none;margin-top:1rem;border-radius:6px;overflow:hidden;
+           background: repeating-conic-gradient(#444 0% 25%, #2a2a2a 0% 50%) 0 0 / 20px 20px;">
+        <img id="clean-preview" alt="PNG sin fondo" style="max-width:100%;max-height:420px;display:block"/>
+      </div>
+
+      <div id="btn-area" style="display:none;margin-top:1rem;display:none;gap:.5rem;flex-wrap:wrap">
+        <a id="download-link" class="btn-primary" href="#" download="sin_fondo.png">⬇ Descargar PNG</a>
+        <a id="go-dxf" class="btn-secondary" href="/imagen">🖼️ Convertir a DXF</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let selectedFile = null;
+  const dropZone = document.getElementById('drop-zone');
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length) {
+      document.getElementById('file-input').files = e.dataTransfer.files;
+      onFileSelected({ target: { files: e.dataTransfer.files } });
+    }
+  });
+
+  function onFileSelected(ev) {
+    selectedFile = ev.target.files[0];
+    const status = document.getElementById('status');
+    const thumb = document.getElementById('thumb-before');
+    const info = document.getElementById('file-info');
+    const btn = document.getElementById('btn-remove');
+    const wrap = document.getElementById('preview-wrap');
+    const btnArea = document.getElementById('btn-area');
+
+    wrap.style.display = 'none';
+    btnArea.style.display = 'none';
+
+    if (!selectedFile) {
+      status.textContent = 'Sube una imagen para ver el resultado.';
+      thumb.style.display = 'none';
+      btn.disabled = true;
+      return;
+    }
+
+    const url = URL.createObjectURL(selectedFile);
+    thumb.src = url;
+    thumb.style.display = 'block';
+    document.getElementById('drop-label').style.display = 'none';
+    info.textContent = `${selectedFile.name}  (${(selectedFile.size/1024).toFixed(1)} KB)`;
+    info.style.display = 'block';
+    status.textContent = 'Imagen lista. Haz clic en \"Quitar fondo\".';
+    btn.disabled = false;
+  }
+
+  async function doRemoveBg() {
+    const status = document.getElementById('status');
+    const preview = document.getElementById('clean-preview');
+    const wrap = document.getElementById('preview-wrap');
+    const btnArea = document.getElementById('btn-area');
+    const download = document.getElementById('download-link');
+    const btn = document.getElementById('btn-remove');
+
+    if (!selectedFile) {
+      status.textContent = 'Selecciona una imagen primero.';
+      return;
+    }
+
+    btn.disabled = true;
+    status.textContent = 'Procesando con IA... (puede tardar unos segundos la primera vez)';
+    wrap.style.display = 'none';
+    btnArea.style.display = 'none';
+
+    const form = new FormData();
+    form.append('file', selectedFile);
+
+    try {
+      const res = await fetch('/remove-bg', { method: 'POST', body: form });
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || 'Error al quitar el fondo.');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      preview.src = url;
+      wrap.style.display = 'block';
+
+      const stem = (selectedFile.name || 'imagen').replace(/\.[^.]+$/, '');
+      download.href = url;
+      download.download = `${stem}_sin_fondo.png`;
+      btnArea.style.display = 'flex';
+
+      // Store result as a File so the DXF page can use it via sessionStorage
+      const resultFile = new File([blob], `${stem}_sin_fondo.png`, { type: 'image/png' });
+      selectedFile = resultFile;
+
+      status.textContent = '✓ Fondo eliminado. Descarga el PNG o convierte a DXF.';
+    } catch (err) {
+      status.textContent = err.message || 'Error al quitar el fondo.';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
