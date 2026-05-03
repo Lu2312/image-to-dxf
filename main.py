@@ -15,7 +15,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
 from PIL import Image
-from rembg import remove
 
 from backend.routers.router_texto        import router as r_txt
 from backend.routers.router_imagen       import router as r_img
@@ -93,6 +92,7 @@ async def remove_background(file: UploadFile = File(..., description="Imagen PNG
         raise HTTPException(413, "Imagen demasiado grande (máx. 20 MB).")
 
     try:
+        from rembg import remove  # lazy: no carga onnxruntime en arranque
         # rembg devuelve PNG con canal alfa
         result = remove(image_bytes)
         img = Image.open(BytesIO(result))
