@@ -197,6 +197,57 @@ image-to-dxf/
 └── tests/
 ```
 
+## Gestión de memoria en producción (droplet 1 GB)
+
+El endpoint `/remove-bg` usa `rembg` con `onnxruntime` para inferencia de IA. En un servidor con RAM limitada esto requiere varias medidas:
+
+### Problema original y soluciones aplicadas
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| OOM killer terminaba el proceso | `--workers 2` = 2 instancias de onnxruntime en RAM | Usar **`--workers 1`** en uvicorn |
+| OOM en la primera inferencia (549 MB pico) | Modelo `u2net.onnx` pesa 176 MB y ocupa ~500 MB en inferencia | Cambiar al modelo **`u2netp`** (4.7 MB, ~80 MB en inferencia) |
+| Sin margen para picos de RAM | Solo 1 GB físico, sin swap | Añadir **2 GB de swap** permanente |
+| Sesión ONNX recreada en cada request | Nueva sesión = recarga del modelo en RAM | **Cachear la sesión** en variable global |
+
+### Cómo se configuró el swap (ya hecho en el VPS)
+
+```bash
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab   # permanente tras reboot
+```
+
+Verificar:
+```bash
+free -h   # debe mostrar Swap: 2.0Gi
+```
+
+### Comportamiento bajo carga concurrente
+
+Con `--workers 1` uvicorn procesa requests de forma **concurrente pero no paralela** (single-process async). Dos usuarios que suban imágenes al mismo tiempo serán atendidos en secuencia, no simultáneamente, lo que evita duplicar el uso de RAM.
+
+- **Uso en reposo:** ~70 MB
+- **Pico durante inferencia:** ~130 MB (modelo `u2netp`) + swap como colchón
+- **Requests concurrentes:** encolan en el event loop, no bloquean el servidor
+
+Si en el futuro el tráfico justifica paralelismo real, la opción correcta es escalar verticalmente (droplet 2 GB) antes de aumentar workers.
+
+### Modelo u2netp vs u2net
+
+| | `u2net` (original) | `u2netp` (producción) |
+|---|---|---|
+| Tamaño del modelo | 176 MB | 4.7 MB |
+| RAM en inferencia | ~500 MB | ~130 MB |
+| Calidad | Alta | Ligeramente inferior en bordes complejos |
+| Adecuado para | GPU / RAM ≥ 4 GB | VPS 1 GB / CPU |
+
+El modelo se descarga automáticamente en la primera llamada al endpoint y se cachea en `/var/www/arqgen/.u2net/u2netp.onnx`.
+
+---
+
 ## Dependencias principales
 
 | Paquete | Uso |
