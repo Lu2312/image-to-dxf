@@ -16,6 +16,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
 from PIL import Image
 
+# Lazy-loaded rembg session cache (populated on first /remove-bg call)
+_rembg_session = None
+
 from backend.routers.router_texto        import router as r_txt
 from backend.routers.router_imagen       import router as r_img
 
@@ -92,9 +95,12 @@ async def remove_background(file: UploadFile = File(..., description="Imagen PNG
         raise HTTPException(413, "Imagen demasiado grande (máx. 20 MB).")
 
     try:
-        from rembg import remove  # lazy: no carga onnxruntime en arranque
+        from rembg import remove, new_session  # lazy: no carga onnxruntime en arranque
+        global _rembg_session
+        if _rembg_session is None:
+            _rembg_session = new_session("u2netp")  # modelo ligero ~4.7 MB vs ~176 MB
         # rembg devuelve PNG con canal alfa
-        result = remove(image_bytes)
+        result = remove(image_bytes, session=_rembg_session)
         img = Image.open(BytesIO(result))
         out = BytesIO()
         img.save(out, format="PNG")
