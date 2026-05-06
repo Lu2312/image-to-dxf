@@ -67,6 +67,7 @@ class ImagenParams:
     morph_open:     int   = 0       # apertura morfológica
     morph_close:    int   = 0       # cierre morfológico
     pdf_dpi:        int   = 200     # rasterizado PDF
+    enhance_contrast: bool = False  # mejora de contraste automática (CLAHE)
 
 
 # ---------------------------------------------------------------------------
@@ -108,6 +109,12 @@ def _odd_ksize(value: int) -> int:
 
 def _preprocess(gray: np.ndarray, p: ImagenParams) -> np.ndarray:
     img = gray
+    
+    # Mejora de contraste usando CLAHE (ideal para mapas)
+    if p.enhance_contrast:
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        img = clahe.apply(img)
+    
     if p.bg_remove:
         blur = cv2.GaussianBlur(img, (0, 0), sigmaX=15)
         img = cv2.divide(img, blur, scale=255)
@@ -284,3 +291,70 @@ def clean_image_bytes(p: ImagenParams) -> bytes:
     if not ok:
         raise ValueError("No se pudo generar la imagen limpia.")
     return buf.tobytes()
+
+
+def generate_preview_svg(p: ImagenParams) -> str:
+    """
+    Genera un SVG con los contornos detectados superpuestos a la imagen binarizada.
+    Útil para previsualizar el DXF antes de descargar.
+    """
+    gray = _load_gray_from_bytes(p.image_bytes, p.content_type, p.pdf_dpi)
+    gray = _preprocess(gray, p)
+    img_h, img_w = gray.shape
+    binary = _threshold_img(gray, p.threshold, p.adaptive, p.invert)
+    
+    if p.morph_open > 0:
+        k = _odd_ksize(p.morph_open) or 3
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (k, k))
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+    if p.morph_close > 0:
+        k = _odd_ksize(p.morph_close) or 3
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (k, k))
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+
+    # Encontrar contornos
+    contours = _find_contours(binary, p.min_area, p.approx_epsilon)
+    
+    # Generar SVG
+    svg_parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{img_w}" height="{img_h}" viewBox="0 0 {img_w} {img_h}">',
+        f'<rect width="{img_w}" height="{img_h}" fill="#f0f0f0"/>',
+    ]
+    
+    # Dibujar contornos
+    mode = p.mode.lower()
+    for c in contours:
+        pts = c.reshape(-1, 2)
+        if len(pts) < 2:
+            continue
+            
+        # Construir path
+        path_data = f"M {pts[0][0]} {pts[0][1]}"
+        for pt in pts[1:]:
+            path_data += f" L {pt[0]} {pt[1]}"
+        path_data += " Z"  # Cerrar path
+        
+        if mode == "hatch":
+            # Relleno sólido
+            svg_parts.append(
+                f'<path d="{path_data}" fill="#2f75b6" stroke="#1a4d7a" stroke-width="1" opacity="0.8"/>'
+            )
+        else:  # trace o pixel
+            # Solo contorno
+            svg_parts.append(
+                f'<path d="{path_data}" fill="none" stroke="#e74c3c" stroke-width="2"/>'
+            )
+    
+    # Agregar información de estadísticas
+    svg_parts.append(
+        f'<text x="10" y="20" fill="#333" font-family="Arial" font-size="14" font-weight="bold">'
+        f'Contornos detectados: {len(contours)}</text>'
+    )
+    svg_parts.append(
+        f'<text x="10" y="40" fill="#666" font-family="Arial" font-size="12">'
+        f'Modo: {p.mode} | Tamaño: {img_w}×{img_h}px | Escala: {p.scale}mm/px</text>'
+    )
+    
+    svg_parts.append('</svg>')
+    
+    return ''.join(svg_parts)

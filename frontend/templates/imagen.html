@@ -31,6 +31,92 @@
                  margin-top:.75rem; font-size:.85rem; }
     .stat-item { background:var(--surface-alt); border-radius:4px; padding:.4rem .6rem; }
     .stat-item span { color:var(--accent2); font-weight:600; }
+    
+    /* Tooltips */
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      margin-left: 6px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: help;
+    }
+    .tooltip-text {
+      visibility: hidden;
+      width: 280px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+    .tooltip-container:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Preview tabs */
+    .preview-mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-mode-btn {
+      padding: 8px 16px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .preview-mode-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+    .preview-mode-btn:hover {
+      color: var(--text);
+    }
+    
+    #dxf-preview-svg {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
@@ -81,7 +167,17 @@
         <div id="tab-conversion" class="tab-content active">
           <div class="form-row" style="margin-top:.5rem">
             <div class="form-group">
-              <label>Modo de conversion</label>
+              <label>
+                Modo de conversion
+                <span class="tooltip-container">
+                  <span class="tooltip-icon">?</span>
+                  <span class="tooltip-text">
+                    <strong>Trace:</strong> Genera contornos como LWPOLYLINE (líneas).<br>
+                    <strong>Hatch:</strong> Genera áreas rellenas con HATCH SOLID.<br>
+                    <strong>Pixel:</strong> Convierte cada píxel en un cuadrado sólido (solo para imágenes pequeñas).
+                  </span>
+                </span>
+              </label>
               <select id="mode">
                 <option value="trace" selected>Trace — contornos LWPOLYLINE</option>
                 <option value="hatch">Hatch — rellenos HATCH SOLID</option>
@@ -89,27 +185,59 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Escala (mm/px)</label>
+              <label>
+                Escala (mm/px)
+                <span class="tooltip-container">
+                  <span class="tooltip-icon">?</span>
+                  <span class="tooltip-text">
+                    Define cuántos milímetros representa cada píxel de la imagen. Por ejemplo, 0.1 = 1 píxel será 0.1mm en el DXF. Valores más altos crean dibujos más grandes.
+                  </span>
+                </span>
+              </label>
               <input id="scale" type="number" value="0.1" min="0.01" max="100" step="0.01"/>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Umbral binarizacion (0–255)</label>
+              <label>
+                Umbral binarizacion (0–255)
+                <span class="tooltip-container">
+                  <span class="tooltip-icon">?</span>
+                  <span class="tooltip-text">
+                    Separa los píxeles claros de los oscuros. Valores más bajos detectan más elementos oscuros. Usa 127 como punto medio. Ajusta si la imagen tiene mucho o poco contraste.
+                  </span>
+                </span>
+              </label>
               <input id="threshold" type="range" min="0" max="255" value="127"
                 oninput="document.getElementById('thr-val').textContent=this.value"/>
               <small style="color:var(--muted)">Valor: <span id="thr-val">127</span></small>
             </div>
             <div class="form-group">
-              <label>Area minima de contorno (px2)</label>
+              <label>
+                Area minima de contorno (px²)
+                <span class="tooltip-container">
+                  <span class="tooltip-icon">?</span>
+                  <span class="tooltip-text">
+                    Ignora contornos pequeños menores a este tamaño (en píxeles cuadrados). Aumenta este valor para eliminar ruido y detalles muy pequeños.
+                  </span>
+                </span>
+              </label>
               <input id="min_area" type="number" value="10" min="0" max="5000" step="1"/>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Simplificacion D-P (epsilon, px)</label>
+              <label>
+                Simplificacion D-P (epsilon, px)
+                <span class="tooltip-container">
+                  <span class="tooltip-icon">?</span>
+                  <span class="tooltip-text">
+                    <strong>Douglas-Peucker:</strong> Reduce el número de puntos en los contornos. Valores más altos = líneas más suaves pero menos precisas. Usa 0 para máxima precisión o 1-2 para simplificar.
+                  </span>
+                </span>
+              </label>
               <input id="approx_epsilon" type="number" value="0.5" min="0" max="20" step="0.1"/>
             </div>
             <div class="form-group">
@@ -120,8 +248,27 @@
 
           <div class="form-group" style="margin-top:.5rem">
             <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+              <input id="enhance_contrast" type="checkbox" style="width:auto"/>
+              🎨 Mejorar contraste automáticamente (recomendado para mapas)
+              <span class="tooltip-container">
+                <span class="tooltip-icon">?</span>
+                <span class="tooltip-text">
+                  Aplica ecualización de histograma adaptativa (CLAHE) para mejorar el contraste. <strong>Ideal para mapas de Google Maps</strong> y imágenes con bajo contraste. Realiza automáticamente la conversión a escala de grises y mejora de contraste.
+                </span>
+              </span>
+            </label>
+          </div>
+          
+          <div class="form-group" style="margin-top:.5rem">
+            <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
               <input id="spline" type="checkbox" style="width:auto"/>
               Usar SPLINE en vez de LWPOLYLINE (solo modo trace)
+              <span class="tooltip-container">
+                <span class="tooltip-icon">?</span>
+                <span class="tooltip-text">
+                  Genera curvas suaves (SPLINE) en lugar de polilíneas. Útil para dibujos orgánicos o con curvas pronunciadas. Solo funciona en modo Trace.
+                </span>
+              </span>
             </label>
           </div>
         </div>
@@ -184,7 +331,7 @@
       </div>
 
       <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem">
-        <button class="btn-primary" onclick="doInfo()">🔍 Previsualizar estadisticas</button>
+        <button class="btn-primary" onclick="doInfo()">🔍 Previsualizar DXF</button>
         <button class="btn-secondary" id="btn-dl" onclick="doDownload()" style="display:none">⬇ Descargar DXF</button>
       </div>
 
@@ -199,16 +346,37 @@
       <div id="mueble3d-cutlist" style="display:none;margin-top:1rem"></div>
     </div>
 
-    <!-- PREVIEW (imagen original escalada) -->
+    <!-- PREVIEW (imagen original + DXF preview) -->
     <div class="panel preview-panel">
-      <h2>Imagen original</h2>
-      <div id="img-area" style="width:100%;min-height:400px;display:flex;
-           align-items:center;justify-content:center;background:var(--surface-alt);
-           border-radius:6px;overflow:auto">
-        <span style="color:var(--muted);font-size:.9rem">La imagen seleccionada aparecera aqui</span>
+      <h2>Vista Previa</h2>
+      
+      <div class="preview-mode-tabs">
+        <button class="preview-mode-btn active" onclick="switchPreviewMode('original')">📷 Imagen Original</button>
+        <button class="preview-mode-btn" id="dxf-preview-tab" onclick="switchPreviewMode('dxf')">🎨 Vista Previa DXF</button>
       </div>
+      
+      <div id="preview-original" style="display:block">
+        <div id="img-area" style="width:100%;min-height:400px;display:flex;
+             align-items:center;justify-content:center;background:var(--surface-alt);
+             border-radius:6px;overflow:auto">
+          <span style="color:var(--muted);font-size:.9rem">La imagen seleccionada aparecera aqui</span>
+        </div>
+      </div>
+      
+      <div id="preview-dxf" style="display:none">
+        <div style="width:100%;min-height:400px;display:flex;
+             align-items:center;justify-content:center;background:var(--surface-alt);
+             border-radius:6px;overflow:auto;padding:16px">
+          <div id="dxf-preview-area" style="width:100%;text-align:center;">
+            <span style="color:var(--muted);font-size:.9rem">
+              Haz clic en "🔍 Previsualizar" para ver los contornos que se convertirán a DXF
+            </span>
+          </div>
+        </div>
+      </div>
+      
       <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">
-        La vista previa DXF solo es visible al abrir el archivo en AutoCAD / LibreCAD / BricsCAD.
+        💡 La vista previa DXF muestra los contornos detectados. Ajusta el umbral y área mínima si no se detectan bien.
       </p>
     </div>
 
@@ -275,6 +443,12 @@ function loadFile(f) {
   // Reset stats
   document.getElementById("stats-box").style.display = "none";
   document.getElementById("btn-dl").style.display = "none";
+  
+  // Reset DXF preview
+  const dxfArea = document.getElementById("dxf-preview-area");
+  dxfArea.innerHTML = '<span style="color:var(--muted);font-size:.9rem">Haz clic en "🔍 Previsualizar" para ver los contornos que se convertirán a DXF</span>';
+  switchPreviewMode('original');
+  
   const prev = document.getElementById("mueble3d-preview");
   const notes = document.getElementById("mueble3d-notes");
   const cutlist = document.getElementById("mueble3d-cutlist");
@@ -345,6 +519,7 @@ function buildFormData() {
   fd.append("min_area",       document.getElementById("min_area").value);
   fd.append("approx_epsilon", document.getElementById("approx_epsilon").value);
   fd.append("spline",         document.getElementById("spline").checked ? "true" : "false");
+  fd.append("enhance_contrast", document.getElementById("enhance_contrast").checked ? "true" : "false");
   fd.append("title",          document.getElementById("title").value);
   fd.append("pre_clean",      preClean);
   fd.append("bg_remove",      bgRemove);
@@ -373,8 +548,13 @@ function buildMueble3DFormData() {
 async function doInfo() {
   if (!selectedFile) { alert("Primero selecciona una imagen."); return; }
   const fd = buildFormData();
+  
+  // Mostrar spinner o loading
+  const dxfArea = document.getElementById("dxf-preview-area");
+  dxfArea.innerHTML = '<div style="color:var(--accent);font-size:.9rem">⏳ Procesando y generando vista previa...</div>';
+  
   try {
-    const res = await fetch("/api/imagen/info", { method: "POST", body: fd });
+    const res = await fetch("/api/imagen/preview", { method: "POST", body: fd });
     if (!res.ok) {
       const errText = await res.text();
       try {
@@ -383,9 +563,12 @@ async function doInfo() {
       } catch {
         alert(errText || "Error");
       }
+      dxfArea.innerHTML = '<span style="color:var(--muted);font-size:.9rem">Error al generar vista previa</span>';
       return;
     }
     const d = await res.json();
+    
+    // Actualizar estadísticas
     const grid = document.getElementById("stats-content");
     grid.innerHTML = [
       ["Modo",            d.mode],
@@ -396,7 +579,40 @@ async function doInfo() {
     ].map(([k,v]) => `<div class="stat-item">${k}<br><span>${v}</span></div>`).join("");
     document.getElementById("stats-box").style.display = "block";
     document.getElementById("btn-dl").style.display = "inline-flex";
-  } catch(e) { alert("Error de conexion: " + e.message); }
+    
+    // Mostrar SVG en el área de preview
+    if (d.svg) {
+      dxfArea.innerHTML = d.svg;
+      // Activar automáticamente la pestaña de vista previa DXF
+      switchPreviewMode('dxf');
+      // Habilitar el botón de la pestaña DXF
+      document.getElementById("dxf-preview-tab").disabled = false;
+    } else {
+      dxfArea.innerHTML = '<span style="color:var(--muted);font-size:.9rem">No se pudo generar vista previa</span>';
+    }
+    
+  } catch(e) { 
+    alert("Error de conexion: " + e.message);
+    dxfArea.innerHTML = '<span style="color:var(--muted);font-size:.9rem">Error de conexión</span>';
+  }
+}
+
+function switchPreviewMode(mode) {
+  const originalDiv = document.getElementById("preview-original");
+  const dxfDiv = document.getElementById("preview-dxf");
+  const buttons = document.querySelectorAll(".preview-mode-btn");
+  
+  buttons.forEach(btn => btn.classList.remove("active"));
+  
+  if (mode === 'original') {
+    originalDiv.style.display = "block";
+    dxfDiv.style.display = "none";
+    buttons[0].classList.add("active");
+  } else {
+    originalDiv.style.display = "none";
+    dxfDiv.style.display = "block";
+    buttons[1].classList.add("active");
+  }
 }
 
 async function doDownload() {

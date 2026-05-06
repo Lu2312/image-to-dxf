@@ -1,18 +1,41 @@
-﻿# Lu CAD Studio — Image & Text to DXF
+﻿# image-to-dxf
 
 Herramienta web para convertir imágenes y texto a planos DXF, con eliminación de fondo por IA.  
 Disponible en [lucadstudio.com](https://lucadstudio.com).
+
+## 🎉 Nuevas Funcionalidades
+
+### Vista Previa del DXF
+Ahora puedes **ver los contornos detectados ANTES de descargar** el archivo DXF:
+- 🎨 Vista previa SVG interactiva con los contornos detectados
+- 📊 Estadísticas en tiempo real (contornos, entidades, tamaño)
+- 🔄 Ajusta parámetros y previsualiza instantáneamente
+- ✅ Descarga solo cuando estés satisfecho con el resultado
+
+### Tooltips Explicativos
+Cada configuración ahora incluye ayuda contextual:
+- **Umbral**: Cómo afecta la detección de elementos
+- **Área mínima**: Elimina ruido y detalles pequeños
+- **Simplificación D-P**: Suaviza las líneas
+- **Modo de conversión**: Cuándo usar cada modo
+- Y más...
+
+### Guía para Mapas de Google Maps
+- 📖 Nueva guía completa: `GUIA_GOOGLE_MAPS.md`
+- Configuraciones recomendadas para diferentes tipos de mapas
+- Solución de problemas comunes
+- Ejemplos paso a paso
 
 ## Funcionalidades
 
 | Módulo | Descripción |
 |---|---|
-| **Imagen → DXF** | Convierte PNG/JPG a entidades DXF (trazado de contornos con OpenCV) |
+| **Imagen → DXF** | Convierte PNG/JPG a entidades DXF (trazado de contornos con OpenCV) con vista previa |
 | **Quitar fondo** | Eliminación de fondo por IA usando rembg (modelo U2Net) |
 | **Texto → DXF** | Genera planos DXF a partir de parámetros de texto |
 
 ## Requisitos
-
+    location = /ads.txt {
 - Python 3.11+
 - pip
 
@@ -57,7 +80,7 @@ apt-get install -y python3 python3-venv python3-pip git nginx libgl1 libglib2.0-
 
 ```bash
 mkdir -p /var/www/arqgen
-cd /var/www/arqgen
+    location = /ads.txt {
 git clone https://github.com/Lu2312/image-to-dxf.git .
 ```
 
@@ -80,7 +103,7 @@ chown -R www-data:www-data /var/www/arqgen
 Crea `/etc/systemd/system/arqgen.service`:
 
 ```ini
-[Unit]
+@app.get("/ads.txt", response_class=FileResponse)
 Description=Lu CAD Studio - FastAPI App
 After=network.target
 
@@ -167,7 +190,7 @@ git reset --hard origin/main
 chown -R www-data:www-data /var/www/arqgen
 /var/www/arqgen/venv/bin/pip install -r requirements.txt -q
 systemctl restart arqgen
-sleep 3
+              <label>
 systemctl status arqgen --no-pager
 echo '=== Listo ==='
 ```
@@ -260,3 +283,4 @@ El modelo se descarga automáticamente en la primera llamada al endpoint y se ca
 | `rembg[cpu]` | Eliminacion de fondo por IA (U2Net) |
 | `PyMuPDF` | Extraccion de texto desde PDF |
 | `python-multipart` | Soporte de subida de archivos en FastAPI |
+    return buf.tobytes()    <!-- PREVIEW (original image + DXF preview) -->

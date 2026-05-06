@@ -7,7 +7,7 @@ from __future__ import annotations
 from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 from fastapi.responses import Response
 
-from ..generators.gen_imagen import ImagenGenerator, ImagenParams, clean_image_bytes
+from ..generators.gen_imagen import ImagenGenerator, ImagenParams, clean_image_bytes, generate_preview_svg
 from ..generators.gen_mueble_pdf import Mueble3DGenerator, Mueble3DParams
 
 router = APIRouter(prefix="/api/imagen", tags=["Imagen a DXF"])
@@ -32,6 +32,7 @@ async def imagen_to_dxf(
     morph_open:     int   = Form(0,        description="Apertura morfologica"),
     morph_close:    int   = Form(0,        description="Cierre morfologico"),
     pdf_dpi:        int   = Form(200,      description="DPI para rasterizar PDF"),
+    enhance_contrast: bool = Form(False,   description="Mejora de contraste automática (ideal para mapas)"),
 ):
     """Convierte la imagen subida a DXF y devuelve el archivo binario."""
     if not file.content_type or not (
@@ -64,6 +65,7 @@ async def imagen_to_dxf(
         morph_open     = morph_open,
         morph_close    = morph_close,
         pdf_dpi        = pdf_dpi,
+        enhance_contrast = enhance_contrast,
     )
 
     try:
@@ -102,6 +104,7 @@ async def imagen_info(
     morph_open:     int   = Form(0),
     morph_close:    int   = Form(0),
     pdf_dpi:        int   = Form(200),
+    enhance_contrast: bool = Form(False),
 ):
     """Procesa la imagen y devuelve estadísticas (sin descargar el DXF)."""
     image_bytes = await file.read()
@@ -121,6 +124,7 @@ async def imagen_info(
         morph_open=morph_open,
         morph_close=morph_close,
         pdf_dpi=pdf_dpi,
+        enhance_contrast=enhance_contrast,
     )
     result = ImagenGenerator().generate(params)
     return {
@@ -132,6 +136,67 @@ async def imagen_info(
         "dxf_width_mm":  result.dxf_width_mm,
         "dxf_height_mm": result.dxf_height_mm,
     }
+
+
+@router.post("/preview")
+async def imagen_preview(
+    file:           UploadFile = File(...),
+    mode:           str   = Form("trace"),
+    scale:          float = Form(0.1),
+    threshold:      int   = Form(127),
+    min_area:       float = Form(10.0),
+    approx_epsilon: float = Form(0.5),
+    pre_clean:      bool  = Form(False),
+    bg_remove:      bool  = Form(False),
+    adaptive:       bool  = Form(False),
+    invert:         bool  = Form(True),
+    denoise_ksize:  int   = Form(3),
+    morph_open:     int   = Form(0),
+    morph_close:    int   = Form(0),
+    pdf_dpi:        int   = Form(200),
+    spline:         bool  = Form(False),
+    title:          str   = Form(""),
+    enhance_contrast: bool = Form(False),
+):
+    """Genera una vista previa SVG de los contornos detectados."""
+    image_bytes = await file.read()
+    params = ImagenParams(
+        image_bytes=image_bytes,
+        content_type=file.content_type or "",
+        mode=mode,
+        scale=scale,
+        threshold=threshold,
+        min_area=min_area,
+        approx_epsilon=approx_epsilon,
+        spline=spline,
+        title=title or file.filename or "Imagen",
+        pre_clean=pre_clean,
+        bg_remove=bg_remove,
+        adaptive=adaptive,
+        invert=invert,
+        denoise_ksize=denoise_ksize,
+        morph_open=morph_open,
+        morph_close=morph_close,
+        pdf_dpi=pdf_dpi,
+        enhance_contrast=enhance_contrast,
+    )
+    
+    try:
+        svg_content = generate_preview_svg(params)
+        # También generar estadísticas
+        result = ImagenGenerator().generate(params)
+        return {
+            "svg": svg_content,
+            "mode": result.mode,
+            "contour_count": result.contour_count,
+            "entity_count": result.entity_count,
+            "img_width": result.img_width,
+            "img_height": result.img_height,
+            "dxf_width_mm": result.dxf_width_mm,
+            "dxf_height_mm": result.dxf_height_mm,
+        }
+    except ValueError as e:
+        raise HTTPException(422, str(e))
 
 
 @router.post("/clean")
