@@ -33,6 +33,8 @@ async def imagen_to_dxf(
     morph_close:    int   = Form(0,        description="Cierre morfologico"),
     pdf_dpi:        int   = Form(200,      description="DPI para rasterizar PDF"),
     enhance_contrast: bool = Form(False,   description="Mejora de contraste automática (ideal para mapas)"),
+    use_ocr:        bool  = Form(False,    description="Detectar texto con OCR"),
+    ocr_lang:       str   = Form("spa",    description="Idioma OCR (spa, eng, etc.)"),
 ):
     """Convierte la imagen subida a DXF y devuelve el archivo binario."""
     if not file.content_type or not (
@@ -66,6 +68,8 @@ async def imagen_to_dxf(
         morph_close    = morph_close,
         pdf_dpi        = pdf_dpi,
         enhance_contrast = enhance_contrast,
+        use_ocr        = use_ocr,
+        ocr_lang       = ocr_lang,
     )
 
     try:
@@ -105,6 +109,8 @@ async def imagen_info(
     morph_close:    int   = Form(0),
     pdf_dpi:        int   = Form(200),
     enhance_contrast: bool = Form(False),
+    use_ocr:        bool  = Form(False),
+    ocr_lang:       str   = Form("spa"),
 ):
     """Procesa la imagen y devuelve estadísticas (sin descargar el DXF)."""
     image_bytes = await file.read()
@@ -125,6 +131,8 @@ async def imagen_info(
         morph_close=morph_close,
         pdf_dpi=pdf_dpi,
         enhance_contrast=enhance_contrast,
+        use_ocr=use_ocr,
+        ocr_lang=ocr_lang,
     )
     result = ImagenGenerator().generate(params)
     return {
@@ -157,6 +165,8 @@ async def imagen_preview(
     spline:         bool  = Form(False),
     title:          str   = Form(""),
     enhance_contrast: bool = Form(False),
+    use_ocr:        bool  = Form(False),
+    ocr_lang:       str   = Form("spa"),
 ):
     """Genera una vista previa SVG de los contornos detectados."""
     image_bytes = await file.read()
@@ -179,6 +189,8 @@ async def imagen_preview(
         morph_close=morph_close,
         pdf_dpi=pdf_dpi,
         enhance_contrast=enhance_contrast,
+        use_ocr=use_ocr,
+        ocr_lang=ocr_lang,
     )
     
     try:

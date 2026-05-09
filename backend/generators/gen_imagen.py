@@ -23,6 +23,12 @@ import numpy as np
 import ezdxf
 from PIL import Image
 
+try:
+    import pytesseract
+    HAS_TESSERACT = True
+except ImportError:
+    HAS_TESSERACT = False
+
 
 # ---------------------------------------------------------------------------
 # Result
@@ -68,6 +74,9 @@ class ImagenParams:
     morph_close:    int   = 0       # cierre morfológico
     pdf_dpi:        int   = 200     # rasterizado PDF
     enhance_contrast: bool = False  # mejora de contraste automática (CLAHE)
+    use_ocr:        bool  = False   # detectar texto con OCR
+    ocr_lang:       str   = "spa"   # idioma para OCR (spa, eng, etc.)
+    layer_text:     str   = "TEXTO" # capa para texto OCR
 
 
 # ---------------------------------------------------------------------------
@@ -158,6 +167,61 @@ def _px2w(pt: Tuple[float, float], h: int,
     return pt[0] * scale, (h - 1 - pt[1]) * scale
 
 
+def _extract_text_with_ocr(gray: np.ndarray, lang: str = "spa") -> List[dict]:
+    """
+    Extrae texto y sus posiciones usando OCR (Tesseract).
+    Retorna lista de diccionarios con: text, x, y, width, height
+    """
+    if not HAS_TESSERACT:
+        import warnings
+        warnings.warn("OCR solicitado pero pytesseract no está instalado o Tesseract no está en PATH")
+        return []
+    
+    try:
+        # Configurar Tesseract para obtener datos detallados
+        custom_config = r'--oem 3 --psm 11'
+        data = pytesseract.image_to_data(
+            gray, 
+            lang=lang, 
+            config=custom_config,
+            output_type=pytesseract.Output.DICT
+        )
+        
+        texts = []
+        n_boxes = len(data['text'])
+        
+        for i in range(n_boxes):
+            text = data['text'][i].strip()
+            conf = int(data['conf'][i]) if data['conf'][i] != '-1' else 0
+            
+            # Filtrar: solo texto con confianza > 30 y al menos 2 caracteres
+            if text and len(text) >= 2 and conf > 30:
+                x = data['left'][i]
+                y = data['top'][i]
+                w = data['width'][i]
+                h = data['height'][i]
+                
+                texts.append({
+                    'text': text,
+                    'x': x,
+                    'y': y,
+                    'width': w,
+                    'height': h,
+                    'confidence': conf
+                })
+        
+        return texts
+    except Exception as e:
+        import warnings
+        warnings.warn(f"Error en OCR: {str(e)}")
+        return []
+        
+        return texts
+    except Exception as e:
+        # Si falla OCR, retornar lista vacía
+        return []
+
+
 def _add_info_block(msp, title: str, img_w: int, img_h: int,
                     scale: float) -> None:
     doc = msp.doc
@@ -208,6 +272,7 @@ class ImagenGenerator:
             (p.layer_contour, 7),
             (p.layer_hatch,   2),
             (p.layer_pixel,   3),
+            (p.layer_text,    1),  # Capa para texto OCR
         ]:
             if lname not in doc.layers:
                 doc.layers.add(lname, color=color,
@@ -249,6 +314,29 @@ class ImagenGenerator:
                     hatch = msp.add_hatch(dxfattribs={"layer": p.layer_hatch})
                     hatch.set_pattern_fill("SOLID")
                     hatch.paths.add_polyline_path(pts, is_closed=True)
+
+        # Agregar texto detectado con OCR
+        if p.use_ocr:
+            texts = _extract_text_with_ocr(gray, p.ocr_lang)
+            for txt_data in texts:
+                # Calcular posición en coordenadas DXF
+                x_px = txt_data['x'] + txt_data['width'] / 2  # Centro horizontal
+                y_px = txt_data['y'] + txt_data['height'] / 2  # Centro vertical
+                x_dxf, y_dxf = _px2w((x_px, y_px), img_h, p.scale)
+                
+                # Calcular altura del texto basada en altura del bbox
+                text_height = max(txt_data['height'] * p.scale * 0.8, 1.0)
+                
+                # Agregar entidad TEXT al DXF
+                msp.add_text(
+                    txt_data['text'],
+                    dxfattribs={
+                        "layer": p.layer_text,
+                        "height": text_height,
+                        "insert": (x_dxf, y_dxf),
+                        "rotation": 0.0,
+                    }
+                )
 
         _add_info_block(msp, p.title, img_w, img_h, p.scale)
 
@@ -354,6 +442,33 @@ def generate_preview_svg(p: ImagenParams) -> str:
         f'<text x="10" y="40" fill="#666" font-family="Arial" font-size="12">'
         f'Modo: {p.mode} | Tamaño: {img_w}×{img_h}px | Escala: {p.scale}mm/px</text>'
     )
+    
+    # Si OCR está activado, mostrar texto detectado
+    if p.use_ocr:
+        texts = _extract_text_with_ocr(gray, p.ocr_lang)
+        for txt_data in texts:
+            x = txt_data['x']
+            y = txt_data['y']
+            w = txt_data['width']
+            h = txt_data['height']
+            text = txt_data['text']
+            
+            # Dibujar rectángulo alrededor del texto
+            svg_parts.append(
+                f'<rect x="{x}" y="{y}" width="{w}" height="{h}" '
+                f'fill="none" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>'
+            )
+            # Dibujar el texto detectado
+            svg_parts.append(
+                f'<text x="{x + w/2}" y="{y + h/2}" fill="#27ae60" '
+                f'font-family="Arial" font-size="{max(h*0.7, 10)}" '
+                f'text-anchor="middle" dominant-baseline="middle" font-weight="bold">{text}</text>'
+            )
+        
+        svg_parts.append(
+            f'<text x="10" y="60" fill="#27ae60" font-family="Arial" font-size="12">'
+            f'Texto detectado (OCR): {len(texts)} elementos</text>'
+        )
     
     svg_parts.append('</svg>')
     

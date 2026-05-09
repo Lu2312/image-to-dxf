@@ -80,6 +80,31 @@ def page_privacidad():
     return FileResponse(TEMPLATES / "privacidad.html")
 
 
+@app.get("/blog", response_class=FileResponse)
+def page_blog():
+    return FileResponse(TEMPLATES / "blog.html")
+
+
+@app.get("/blog/preparar-logo-jpg-para-dxf", response_class=FileResponse)
+def page_blog_logo():
+    return FileResponse(TEMPLATES / "blog_preparar_logo.html")
+
+
+@app.get("/blog/diferencias-dxf-dwg", response_class=FileResponse)
+def page_blog_dxf_dwg():
+    return FileResponse(TEMPLATES / "blog_dxf_dwg.html")
+
+
+@app.get("/blog/convertir-fotos-modelos-3d", response_class=FileResponse)
+def page_blog_3d():
+    return FileResponse(TEMPLATES / "blog_3d.html")
+
+
+@app.get("/ads.txt", response_class=FileResponse)
+def ads_txt():
+    return FileResponse(BASE / "ads.txt", media_type="text/plain")
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "arqgen"}

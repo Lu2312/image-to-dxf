@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diferencias entre formatos DXF y DWG para cortadoras láser | lucadstudio.com</title>
+  <meta name="description" content="Guía completa sobre las diferencias entre DXF y DWG. Aprende qué formato usar para cortadoras láser CNC, compatibilidad y casos de uso recomendados."/>
+  <link rel="canonical" href="https://lucadstudio.com/blog/diferencias-dxf-dwg"/>
+  
+  <!-- Google AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-3833242390185896">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3833242390185896"
+     crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">Lu CAD Studio</a>
+  <a href="/imagen" class="nav-highlight">🖼️ Imagen→DXF</a>
+  <a href="/limpieza" class="nav-highlight">🧼 Quitar fondo</a>
+  <a href="/texto" class="nav-highlight">✏️ Texto→DXF</a>
+  <a href="/blog" class="nav-highlight">📚 Blog</a>
+  <a href="/#planes">Planes</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<div class="container" style="max-width:780px;">
+  
+  <div style="padding: 2.5rem 0 1rem;">
+    <a href="/blog" style="color:var(--accent2); text-decoration:none; font-size:.875rem;">← Volver al Blog</a>
+    <h1 style="font-size:2rem; margin-top:1rem; margin-bottom:.75rem; line-height:1.3;">
+      Diferencias entre formatos DXF y DWG para cortadoras láser
+    </h1>
+    <p style="color:var(--muted); font-size:.875rem;">
+      Publicado el 9 de mayo de 2026 · 6 min de lectura
+    </p>
+  </div>
+
+  <!-- ── BANNER AD ──────────────────────────────────────── -->
+  <div class="ad-slot ad-leaderboard" aria-label="Publicidad" style="margin-bottom:2rem;">
+    <div class="ad-placeholder">
+      <span class="ad-label">Publicidad</span>
+      <span class="ad-size">728 × 90</span>
+    </div>
+  </div>
+
+  <article class="panel" style="line-height:1.8; font-size:.95rem; color:var(--muted);">
+    
+    <p style="font-size:1.05rem; color:var(--text); font-weight:500; margin-bottom:1.5rem;">
+      Si trabajas con cortadoras láser, CNC o fabricación digital, probablemente te hayas encontrado 
+      con los formatos DXF y DWG. Aunque ambos son estándares de Autodesk, tienen diferencias 
+      importantes que afectan la compatibilidad, tamaño de archivo y facilidad de uso. En este 
+      artículo te explico cuál usar y por qué.
+    </p>
+
+    <h2 style="color:var(--accent2); font-size:1.3rem; margin:2rem 0 1rem;">
+      ¿Qué es DXF? (Drawing Exchange Format)
+    </h2>
+    <p>
+      <strong style="color:var(--text)">DXF</strong> es un formato de intercambio de dibujos CAD 
+      desarrollado por Autodesk en 1982. Fue diseñado específicamente para que diferentes programas 
+      de CAD pudieran intercambiar archivos sin problemas de compatibilidad.
+    </p>
+    <ul style="padding-left:1.5rem; margin-top:.75rem;">
+      <li><strong style="color:var(--text)">Formato abierto:</strong> La especificación es pública y puede ser implementada por cualquier software.</li>
+      <li><strong style="color:var(--text)">Basado en texto:</strong> Los archivos DXF son legibles por humanos (aunque voluminosos).</li>
+      <li><strong style="color:var(--text)">Compatibilidad universal:</strong> Casi todos los programas CAD, cortadoras láser y CNC soportan DXF.</li>
+      <li><strong style="color:var(--text)">Ligero:</strong> Ideal para web y transferencias rápidas.</li>
+    </ul>
+
+    <h2 style="color:var(--accent2); font-size:1.3rem; margin:2rem 0 1rem;">
+      ¿Qué es DWG? (Drawing)
+    </h2>
+    <p>
+      <strong style="color:var(--text)">DWG</strong> es el formato nativo de AutoCAD, también 
+      desarrollado por Autodesk. Es el formato "real" que usa AutoCAD internamente; DXF es solo 
+      su versión de exportación.
+    </p>
+    <ul style="padding-left:1.5rem; margin-top:.75rem;">
+      <li><strong style="color:var(--text)">Formato propietario:</strong> Aunque ampliamente soportado, es propiedad de Autodesk.</li>
+      <li><strong style="color:var(--text)">Formato binario:</strong> Más compacto que DXF, pero no legible por humanos.</li>
+      <li><strong style="color:var(--text)">Más funciones:</strong> Soporta capas avanzadas, bloques dinámicos, referencias externas (XREF) y más.</li>
+      <li><strong style="color:var(--text)">Mejor para proyectos complejos:</strong> Si trabajas en AutoCAD exclusivamente, DWG es más eficiente.</li>
+    </ul>
+
+    <h2 style="color:var(--accent2); font-size:1.3rem; margin:2rem 0 1rem;">
+      Comparación rápida: DXF vs DWG
+    </h2>
+    <div style="overflow-x:auto; margin:1.5rem 0;">
+      <table style="width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--border);">
+        <thead>
+          <tr style="background:var(--bg);">
+            <th style="padding:.75rem; text-align:left; border:1px solid var(--border); color:var(--text);">Característica</th>
+            <th style="padding:.75rem; text-align:left; border:1px solid var(--border); color:var(--accent2);">DXF</th>
+            <th style="padding:.75rem; text-align:left; border:1px solid var(--border); color:var(--accent1);">DWG</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:.75rem; border:1px solid var(--border); color:var(--text);">Formato</td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Texto (ASCII) o binario</td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Binario</td>
+          </tr>
+          <tr>
+            <td style="padding:.75rem; border:1px solid var(--border); color:var(--text);">Tamaño de archivo</td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Grande (texto)</td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Compacto</td>
+          </tr>
+          <tr>
+            <td style="padding:.75rem; border:1px solid var(--border); color:var(--text);">Compatibilidad</td>
+            <td style="padding:.75rem; border:1px solid var(--border);"><strong style="color:#10b981;">Universal</strong></td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Amplia, pero menos</td>
+          </tr>
+          <tr>
+            <td style="padding:.75rem; border:1px solid var(--border); color:var(--text);">Ideal para...</td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Cortadoras láser, CNC, web</td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Proyectos complejos en AutoCAD</td>
+          </tr>
+          <tr>
+            <td style="padding:.75rem; border:1px solid var(--border); color:var(--text);">Soporte de funciones avanzadas</td>
+            <td style="padding:.75rem; border:1px solid var(--border);">Limitado</td>
+            <td style="padding:.75rem; border:1px solid var(--border);"><strong style="color:#10b981;">Completo</strong></td>
+          </tr>
+          <tr>
+            <td style="padding:.75rem; border:1px solid var(--border); color:var(--text);">Legible por humanos</td>
+            <td style="padding:.75rem; border:1px solid var(--border);"><strong style="color:#10b981;">Sí (ASCII)</strong></td>
+            <td style="padding:.75rem; border:1px solid var(--border);">No</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 style="color:var(--accent2); font-size:1.3rem; margin:2rem 0 1rem;">
+      ¿Cuál formato usar para cortadoras láser?
+    </h2>
+    <p><strong style="color:var(--text);">Respuesta corta: DXF.</strong></p>
+    <p style="margin-top:.75rem;">La mayoría de cortadoras láser (Epilog, Trotec, Glowforge, Thunder Laser) y software de control 
+      (RDWorks, LightBurn, LaserCAD) soportan DXF de manera nativa. Aunque algunos también aceptan 
+      DWG, DXF es el estándar de facto en la industria de fabricación digital.
+    </p>
+    
+    <div style="background:var(--bg); padding:1rem; border-left:3px solid var(--accent2); margin:1.5rem 0; border-radius:4px;">
+      <strong style="color:var(--text)">💡 Recomendación:</strong> Si solo necesitas contornos y líneas 
+      de corte (sin bloques, XREF o elementos avanzados), usa <strong>DXF</strong>. Es más compatible, 
+      más rápido de procesar y más fácil de depurar si algo falla.
+    </div>
+
+    <h2 style="color:var(--accent2); font-size:1.3rem; margin:2rem 0 1rem;">
+      Casos de uso recomendados
+    </h2>
+    
+    <h3 style="color:var(--text); font-size:1.1rem; margin:1.5rem 0 .75rem;">Usa DXF cuando:</h3>
+    <ul style="padding-left:1.5rem;">
+      <li>Trabajas con cortadoras láser, CNC o routers.</li>
+      <li>Necesitas compatibilidad universal con diferentes programas.</li>
+      <li>Compartes archivos con clientes que no usan AutoCAD.</li>
+      <li>Generas archivos desde web o scripts (como <a href="/imagen" style="color:var(--accent2);">lucadstudio.com</a>).</li>
+      <li>Solo necesitas geometría 2D básica (líneas, polilíneas, arcos, círculos).</li>
+    </ul>
+
+    <h3 style="color:var(--text); font-size:1.1rem; margin:1.5rem 0 .75rem;">Usa DWG cuando:</h3>
+    <ul style="padding-left:1.5rem;">
+      <li>Trabajas exclusivamente en AutoCAD o BricsCAD.</li>
+      <li>Necesitas funciones avanzadas (bloques dinámicos, XREF, DesignCenter).</li>
+      <li>El proyecto tiene múltiples capas, anotaciones y estilos complejos.</li>
+      <li>Compartes archivos con otros usuarios de AutoCAD y necesitas preservar toda la información.</li>
+    </ul>
+
+    <h2 style="color:var(--accent2); font-size:1.3rem; margin:2rem 0 1rem;">
+      ¿Puedo convertir entre DXF y DWG?
+    </h2>
+    <p><strong style="color:var(--text);">Sí, fácilmente.</strong></p>
+    <ul style="padding-left:1.5rem; margin-top:.75rem;">
+      <li><strong style="color:var(--text)">Desde AutoCAD:</strong> Archivo → Guardar como → Selecciona el formato deseado.</li>
+      <li><strong style="color:var(--text);">Desde LibreCAD/QCAD:</strong> Archivo → Exportar → Elige DXF o DWG.</li>
+      <li><strong style="color:var(--text);">Herramientas online:</strong> CloudConvert, Zamzar y otros conversores web.</li>
+      <li><strong style="color:var(--text);">Desde código:</strong> Librerías como <code style="background:var(--bg); padding:.1rem .35rem;">ezdxf</code> (Python) permiten convertir programáticamente.</li>
+    </ul>
+
+    <div style="background:var(--panel); padding:1.5rem; border:1px solid var(--border); border-radius:6px; margin:2rem 0;">
+      <strong style="color:var(--text); font-size:1.05rem;">⚠️ Advertencia sobre versiones:</strong>
+      <p style="margin-top:.75rem;">
+        Tanto DXF como DWG tienen múltiples versiones (R12, R2000, R2010, R2018, etc.). 
+        La versión más compatible para cortadoras láser es <strong>DXF R2000</strong> o <strong>R2010</strong>, 
+        que soporta la mayoría de software antiguo y moderno. Nuestra herramienta genera 
+        <strong style="color:var(--accent2);">DXF R2010</strong> por defecto.
+      </p>
+    </div>
+
+    <h2 style="color:var(--accent2); font-size:1.3rem; margin:2rem 0 1rem;">
+      Conclusión
+    </h2>
+    <p>
+      Para <strong style="color:var(--text);">cortadoras láser y CNC, usa DXF</strong>. Es más 
+      compatible, más ligero y soportado universalmente. DWG es excelente para proyectos complejos 
+      en AutoCAD, pero para fabricación digital, DXF es la elección obvia.
+    </p>
+    <p style="margin-top:1rem;">
+      ¿Necesitas generar archivos DXF desde imágenes o texto? 👉 
+      <a href="/imagen" style="color:var(--accent2); font-weight:600;">Prueba nuestra herramienta gratuita</a>
+    </p>
+
+  </article>
+
+  <!-- ── MÁS ARTÍCULOS ──────────────────────────────────── -->
+  <div style="margin-top:3rem; padding-top:2rem; border-top:1px solid var(--border);">
+    <h3 style="color:var(--text); font-size:1.2rem; margin-bottom:1rem;">Más artículos del blog</h3>
+    <div style="display:grid; gap:1rem;">
+      <a href="/blog/preparar-logo-jpg-para-dxf" style="display:block; padding:1rem; background:var(--panel); border:1px solid var(--border); border-radius:6px; text-decoration:none;">
+        <strong style="color:var(--accent2); font-size:1rem;">Cómo preparar un logo en JPG para una conversión limpia a DXF</strong>
+        <p style="color:var(--muted); font-size:.875rem; margin-top:.4rem;">Guía paso a paso para optimizar logos e imágenes antes de convertirlas...</p>
+      </a>
+      <a href="/blog/convertir-fotos-modelos-3d" style="display:block; padding:1rem; background:var(--panel); border:1px solid var(--border); border-radius:6px; text-decoration:none;">
+        <strong style="color:var(--accent2); font-size:1rem;">Guía para convertir fotos en modelos 3D para impresión</strong>
+        <p style="color:var(--muted); font-size:.875rem; margin-top:.4rem;">Del concepto 2D al modelo 3D imprimible. Aprende técnicas de preparación...</p>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<footer style="margin-top:4rem;">
+  <strong>Lu CAD Studio</strong> — lucadstudio.com &nbsp;|&nbsp;
+  <a href="/imagen" style="color:var(--accent2)">Imagen→DXF</a> &nbsp;|&nbsp;
+  <a href="/texto" style="color:var(--accent2)">Texto→DXF</a> &nbsp;|&nbsp;
+  <a href="/blog" style="color:var(--accent2)">Blog</a> &nbsp;|&nbsp;
+  <a href="/privacidad" style="color:var(--accent2)">Privacidad</a> &nbsp;|&nbsp;
+  <a href="/docs" style="color:var(--accent2)">API</a>
+</footer>
+
+</body>
+</html>
