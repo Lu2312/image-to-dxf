@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Del Levantamiento Topográfico al Archivo DXF: Guía Práctica | lucadstudio.com</title>
+  <meta name="description" content="Proceso completo para realizar levantamientos topográficos con estación total, procesar datos de campo y exportar a formato DXF para AutoCAD, Civil 3D y software CAD."/>
+  <link rel="canonical" href="https://lucadstudio.com/blog/levantamiento-dxf"/>
+  
+  <!-- Google AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-3833242390185896">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3833242390185896"
+     crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">Lu CAD Studio</a>
+  <a href="/imagen" class="nav-highlight">🖼️ Imagen→DXF</a>
+  <a href="/limpieza" class="nav-highlight">🧼 Quitar fondo</a>
+  <a href="/texto" class="nav-highlight">✏️ Texto→DXF</a>
+  <a href="/blog" class="nav-highlight">📚 Blog</a>
+  <a href="/#planes">Planes</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<!-- ── BANNER AD TOP (728×90 leaderboard) ──────────────────── -->
+<div class="ad-slot ad-leaderboard" aria-label="Publicidad">
+  <div class="ad-placeholder">
+    <span class="ad-label">Publicidad</span>
+    <span class="ad-size">728 × 90</span>
+  </div>
+</div>
+
+<article class="container" style="max-width:800px; padding:2rem 1rem;">
+  
+  <!-- ── HEADER DEL ARTÍCULO ──────────────────────────────── -->
+  <div style="margin-bottom:2rem;">
+    <a href="/blog" style="color:var(--accent2); text-decoration:none; font-size:.9rem; display:inline-flex; align-items:center; gap:.5rem;">
+      ← Volver al Blog
+    </a>
+  </div>
+
+  <header style="margin-bottom:2.5rem;">
+    <span class="badge">📡 Levantamiento Topográfico</span>
+    <h1 style="font-size:2.25rem; margin:.75rem 0 1rem; line-height:1.2;">
+      Del Levantamiento Topográfico al Archivo DXF: Guía Práctica
+    </h1>
+    <div style="color:var(--muted); font-size:.95rem; display:flex; gap:1.5rem; flex-wrap:wrap;">
+      <span>📅 Mayo 2026</span>
+      <span>⏱️ 12 minutos de lectura</span>
+      <span>🗺️ Topografía · CAD</span>
+    </div>
+  </header>
+
+  <!-- ── IMAGEN PRINCIPAL ──────────────────────────────────── -->
+  <div style="background:linear-gradient(135deg, #dc2626, #ea580c); height:300px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:2.5rem; font-size:5rem;">
+    📡
+  </div>
+  <p style="text-align:center; color:var(--muted); font-size:.85rem; margin-top:-1.5rem; margin-bottom:2.5rem;">
+    <em>De la estación total al archivo CAD: workflow profesional completo</em>
+  </p>
+
+  <!-- ── CONTENIDO DEL ARTÍCULO ──────────────────────────────── -->
+  
+  <p style="font-size:1.1rem; color:var(--muted); line-height:1.8; margin-bottom:2rem;">
+    Este artículo explica el proceso completo desde la toma de datos en campo con estación total hasta 
+    la generación del archivo DXF final. Ideal para topógrafos, ingenieros civiles y profesionales 
+    que necesitan integrar datos topográficos en proyectos CAD.
+  </p>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Workflow general: campo → procesamiento → DXF
+  </h2>
+
+  <div style="background:var(--bg-alt); padding:2rem; border-radius:8px; margin:2rem 0; border:2px solid var(--accent1);">
+    <div style="display:grid; gap:1.5rem;">
+      <div>
+        <strong style="color:var(--accent2); font-size:1.1rem;">1. Campo (Levantamiento)</strong>
+        <p style="margin:.5rem 0 0; line-height:1.6; color:var(--muted);">
+          Toma de puntos con estación total, GPS o dron. Registro de coordenadas (X, Y, Z), 
+          descripciones y códigos de punto.
+        </p>
+      </div>
+      <div>
+        <strong style="color:var(--accent2); font-size:1.1rem;">2. Procesamiento (Gabinete)</strong>
+        <p style="margin:.5rem 0 0; line-height:1.6; color:var(--muted);">
+          Descarga de datos, limpieza de errores, cálculo de coordenadas, generación de curvas 
+          de nivel y modelo digital del terreno (MDT).
+        </p>
+      </div>
+      <div>
+        <strong style="color:var(--accent2); font-size:1.1rem;">3. Exportación a DXF</strong>
+        <p style="margin:.5rem 0 0; line-height:1.6; color:var(--muted);">
+          Conversión del proyecto topográfico a formato DXF con capas organizadas, listo para 
+          AutoCAD, Civil 3D o cualquier software CAD.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Fase 1: Levantamiento en campo
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📡 Equipos de medición topográfica
+  </h3>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:var(--bg); border-bottom:2px solid var(--border);">
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Equipo</th>
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Precisión</th>
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Uso típico</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><strong>Estación Total</strong></td>
+          <td style="padding:.75rem;">± 2-5 mm</td>
+          <td style="padding:.75rem;">Levantamientos de precisión, replanteo</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><strong>GPS RTK</strong></td>
+          <td style="padding:.75rem;">± 1-3 cm</td>
+          <td style="padding:.75rem;">Terrenos grandes, georreferenciación</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><strong>Nivel Óptico</strong></td>
+          <td style="padding:.75rem;">± 1-2 mm/km</td>
+          <td style="padding:.75rem;">Nivelaciones precisas, altimetrías</td>
+        </tr>
+        <tr>
+          <td style="padding:.75rem;"><strong>Dron con LiDAR</strong></td>
+          <td style="padding:.75rem;">± 3-10 cm</td>
+          <td style="padding:.75rem;">Levantamientos extensos, minería, carreteras</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📋 Datos que se registran por punto
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Cada punto medido en campo contiene:
+  </p>
+
+  <ul style="line-height:1.9; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Número de punto:</strong> Identificador único (ej: 1, 2, 3... o PT001, PT002...)</li>
+    <li><strong>Coordenadas Este (X):</strong> Posición horizontal en metros (UTM o local)</li>
+    <li><strong>Coordenadas Norte (Y):</strong> Posición horizontal en metros</li>
+    <li><strong>Elevación (Z):</strong> Altura sobre nivel de referencia (msnm o relativa)</li>
+    <li><strong>Código de punto:</strong> Descripción (ej: ESQ-EDI, ARBOL, CURVA, POSTE)</li>
+    <li><strong>Observaciones:</strong> Notas adicionales (opcional)</li>
+  </ul>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; border-left:4px solid var(--accent1); margin:2rem 0;">
+    <p style="margin:0; color:var(--text);">
+      <strong>💡 Tip profesional:</strong> Usa códigos de punto consistentes y descriptivos. 
+      Ejemplo: <code style="background:var(--bg); padding:.2rem .5rem;">CURVA</code> para curvas de nivel, 
+      <code style="background:var(--bg); padding:.2rem .5rem;">ESQ</code> para esquinas de edificios, 
+      <code style="background:var(--bg); padding:.2rem .5rem;">ARB</code> para árboles. Esto facilita el procesamiento automático.
+    </p>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🎯 Estrategia de levantamiento
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Para un levantamiento eficiente y completo:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Establece puntos de control:</strong> Monumentos fijos con coordenadas conocidas (GPS o cartografía oficial)</li>
+    <li><strong>Define linderos primero:</strong> Marca las esquinas del terreno con estacas y levántalas</li>
+    <li><strong>Levanta detalles relevantes:</strong> Construcciones, árboles grandes (Ø > 20 cm), postes, bardas</li>
+    <li><strong>Toma puntos para curvas de nivel:</strong> Densidad según irregularidad del terreno (cada 5-10 m en terreno ondulado)</li>
+    <li><strong>Registra cambios de pendiente:</strong> Parteaguas, vaguadas, taludes</li>
+    <li><strong>Fotografía el terreno:</strong> Las fotos ayudan después en gabinete para recordar detalles</li>
+  </ol>
+
+  <!-- AD SLOT — Rectangle 300×250 -->
+  <div class="ad-slot ad-rectangle" aria-label="Publicidad" style="margin:2.5rem auto;">
+    <div class="ad-placeholder">
+      <span class="ad-label">Publicidad</span>
+      <span class="ad-size">300 × 250</span>
+    </div>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Fase 2: Procesamiento en gabinete
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📥 Descarga de datos de la estación total
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    La estación total almacena los puntos en memoria interna o tarjeta SD. Formatos comunes de exportación:
+  </p>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <ul style="line-height:2; margin:0; padding-left:1.5rem;">
+      <li><strong>Formato ASCII (.txt, .csv):</strong> Texto plano con coordenadas separadas por comas o espacios</li>
+      <li><strong>Formato GSI (Leica):</strong> Formato específico de estaciones Leica</li>
+      <li><strong>Formato RAW (Topcon, Sokkia):</strong> Formato nativo de fabricante</li>
+      <li><strong>Formato SDR (Sokkia):</strong> Específico para equipos Sokkia</li>
+    </ul>
+  </div>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    <strong>Ejemplo de archivo CSV de puntos:</strong>
+  </p>
+
+  <div style="background:#1e1e1e; color:#d4d4d4; padding:1.5rem; border-radius:8px; margin:2rem 0; overflow-x:auto; font-family:monospace; font-size:.9rem;">
+    <pre style="margin:0;">Punto,Este,Norte,Elevacion,Codigo
+1,489234.567,2145678.901,2240.50,BM-1
+2,489240.123,2145680.345,2238.75,ESQ-LINDERO
+3,489245.678,2145682.234,2237.20,ARBOL
+4,489250.456,2145684.567,2236.80,CURVA
+5,489255.789,2145686.890,2235.50,CURVA
+6,489260.234,2145689.123,2234.90,CURVA</pre>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🖥️ Software de procesamiento topográfico
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Programas especializados para procesar levantamientos y generar DXF:
+  </p>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:var(--bg); border-bottom:2px solid var(--border);">
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Software</th>
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Tipo</th>
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Fortalezas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><strong>Autodesk Civil 3D</strong></td>
+          <td style="padding:.75rem;">Pago</td>
+          <td style="padding:.75rem;">Integración total con AutoCAD, MDT avanzado</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><strong>Carlson Survey</strong></td>
+          <td style="padding:.75rem;">Pago</td>
+          <td style="padding:.75rem;">Especializado en topografía, curvas automáticas</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><strong>TopoCal (México)</strong></td>
+          <td style="padding:.75rem;">Pago</td>
+          <td style="padding:.75rem;">Adaptado a normativa mexicana, fácil de usar</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><strong>QGIS + Plugins</strong></td>
+          <td style="padding:.75rem;">Gratis</td>
+          <td style="padding:.75rem;">Open source, potente para GIS y topografía básica</td>
+        </tr>
+        <tr>
+          <td style="padding:.75rem;"><strong>Leica Infinity</strong></td>
+          <td style="padding:.75rem;">Pago</td>
+          <td style="padding:.75rem;">Integración con equipos Leica, alta precisión</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🌄 Generación de curvas de nivel
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Las curvas de nivel se generan automáticamente por <strong>interpolación</strong> entre los puntos levantados. Pasos:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Importar puntos:</strong> Cargar el archivo CSV/TXT en el software</li>
+    <li><strong>Crear superficie TIN:</strong> Triangulación irregular de puntos (conecta puntos cercanos formando triángulos)</li>
+    <li><strong>Definir equidistancia:</strong> Separación vertical entre curvas (1m, 2m, 5m según escala)</li>
+    <li><strong>Generar curvas:</strong> El software calcula automáticamente las isolíneas</li>
+    <li><strong>Suavizar curvas (opcional):</strong> Aplicar algoritmos de suavizado para curvas más orgánicas</li>
+    <li><strong>Editar manualmente:</strong> Corregir zonas problemáticas (pocos puntos, errores)</li>
+  </ol>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; border-left:4px solid var(--accent1); margin:2rem 0;">
+    <p style="margin:0; color:var(--text);">
+      <strong>💡 Equidistancias recomendadas:</strong><br>
+      • Terrenos pequeños (< 1,000 m²): <strong>0.5 m</strong><br>
+      • Terrenos medianos (1,000-5,000 m²): <strong>1 m</strong><br>
+      • Terrenos grandes (> 5,000 m²): <strong>2 m</strong><br>
+      • Proyectos carreteros/mineros: <strong>5 m</strong> o más
+    </p>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Fase 3: Exportación a formato DXF
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📤 Configurar exportación DXF
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Al exportar desde el software topográfico, configura:
+  </p>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <ul style="line-height:2; margin:0; padding-left:1.5rem;">
+      <li><strong>Versión DXF:</strong> R2010/R2013 (máxima compatibilidad con AutoCAD 2010+)</li>
+      <li><strong>Unidades:</strong> Metros (unidades del levantamiento)</li>
+      <li><strong>Sistema de coordenadas:</strong> Mantener UTM o sistema local usado en campo</li>
+      <li><strong>Capas (layers):</strong> Organizar elementos por tipo (ver tabla siguiente)</li>
+      <li><strong>Tipo de entidades:</strong> LWPOLYLINE para curvas y linderos, POINT para puntos, TEXT para cotas</li>
+      <li><strong>Georreferenciación:</strong> Incluir metadatos de ubicación (zona UTM, datum)</li>
+    </ul>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📂 Organización de capas (layers) recomendada
+  </h3>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:var(--bg); border-bottom:2px solid var(--border);">
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Capa (Layer)</th>
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Contenido</th>
+          <th style="padding:.75rem; text-align:left; color:var(--accent2);">Color recomendado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">CURVAS-NIVEL</code></td>
+          <td style="padding:.75rem;">Polylines 3D con elevaciones</td>
+          <td style="padding:.75rem;">Marrón (30)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">CURVAS-MAESTRAS</code></td>
+          <td style="padding:.75rem;">Cada 5 o 10 m (más gruesas)</td>
+          <td style="padding:.75rem;">Marrón oscuro (36)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">COTAS</code></td>
+          <td style="padding:.75rem;">Textos con elevaciones (2240.50)</td>
+          <td style="padding:.75rem;">Verde (3)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">LINDERO</code></td>
+          <td style="padding:.75rem;">Polígono del terreno</td>
+          <td style="padding:.75rem;">Rojo (1)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">PUNTOS</code></td>
+          <td style="padding:.75rem;">Puntos del levantamiento</td>
+          <td style="padding:.75rem;">Cian (4)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">EDIFICACIONES</code></td>
+          <td style="padding:.75rem;">Construcciones existentes</td>
+          <td style="padding:.75rem;">Gris (8)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">ARBOLES</code></td>
+          <td style="padding:.75rem;">Bloques de vegetación</td>
+          <td style="padding:.75rem;">Verde (3)</td>
+        </tr>
+        <tr>
+          <td style="padding:.75rem;"><code style="background:var(--bg); padding:.2rem .5rem; border-radius:4px;">VIALIDADES</code></td>
+          <td style="padding:.75rem;">Calles, caminos, banquetas</td>
+          <td style="padding:.75rem;">Blanco (7)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    ✅ Verificación del DXF exportado
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Antes de entregar el archivo DXF, verifica:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Abre en AutoCAD:</strong> Confirma que todas las capas y entidades se visualizan correctamente</li>
+    <li><strong>Revisa coordenadas:</strong> Verifica que los puntos están en la ubicación correcta (compara con campo)</li>
+    <li><strong>Checa curvas de nivel:</strong> No deben cruzarse ni tener saltos ilógicos</li>
+    <li><strong>Verifica textos de cotas:</strong> Que sean legibles y estén en la posición correcta</li>
+    <li><strong>Limpieza:</strong> Elimina puntos auxiliares, líneas de construcción temporales</li>
+    <li><strong>Escala correcta:</strong> Mide una distancia conocida para confirmar que las unidades son correctas</li>
+  </ol>
+
+  <div style="background:linear-gradient(135deg, var(--accent1), var(--accent2)); padding:2rem; border-radius:8px; margin:3rem 0; text-align:center;">
+    <h3 style="color:white; font-size:1.3rem; margin-bottom:1rem;">
+      ¿Tienes planos topográficos en papel o imagen?
+    </h3>
+    <p style="color:rgba(255,255,255,0.9); margin-bottom:1.5rem; line-height:1.6;">
+      Si tienes levantamientos antiguos escaneados o fotografiados, puedes digitalizarlos 
+      convirtiéndolos a formato DXF vectorial para trabajar en AutoCAD.
+    </p>
+    <a href="/imagen" class="btn" style="background:white; color:var(--accent1); display:inline-flex; align-items:center; gap:.5rem; font-weight:600;">
+      🖼️ Convertir Imagen → DXF
+    </a>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Integración con AutoCAD y Civil 3D
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🔧 Importar DXF topográfico en AutoCAD
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Una vez tengas el DXF, abrirlo en AutoCAD es sencillo:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Abre AutoCAD o Civil 3D</li>
+    <li>Archivo → Abrir → Selecciona el archivo .dxf</li>
+    <li>O usa el comando <code style="background:var(--bg-alt); padding:.2rem .5rem;">DXFIN</code> para importarlo</li>
+    <li>Ajusta el <code style="background:var(--bg-alt); padding:.2rem .5rem;">ZOOM EXTENTS</code> para ver todo el levantamiento</li>
+    <li>Guarda como .dwg si necesitas trabajar en formato nativo de AutoCAD</li>
+  </ol>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🏗️ Crear superficie en Civil 3D
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Civil 3D permite crear superficies tridimensionales del terreno:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Pestaña <strong>Home</strong> → <strong>Create Surface</strong></li>
+    <li>Define el nombre y estilo de la superficie</li>
+    <li>Añade datos: <strong>Point Groups</strong> (si importaste puntos) o <strong>Contours</strong> (curvas de nivel)</li>
+    <li>Civil 3D genera automáticamente el modelo 3D del terreno</li>
+    <li>Puedes calcular volúmenes, pendientes, perfiles y secciones transversales</li>
+  </ol>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Errores comunes y soluciones
+  </h2>
+
+  <div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <p style="margin:0 0 1rem; color:#92400e; font-weight:600;">⚠️ Problemas frecuentes:</p>
+    
+    <div style="margin-bottom:1.5rem;">
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">1. Coordenadas incorrectas (edificio en medio del océano)</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Sistema de coordenadas mal configurado.<br>
+        <strong>Solución:</strong> Verifica que el software use el mismo sistema (UTM zona correcta) que la estación total.
+      </p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;">
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">2. Curvas de nivel que se cruzan</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Puntos con errores de elevación o superficie mal calculada.<br>
+        <strong>Solución:</strong> Revisa puntos sospechosos, elimina outliers y recalcula superficie.
+      </p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;">
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">3. DXF demasiado pesado (> 50 MB)</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Demasiados puntos o curvas muy densas.<br>
+        <strong>Solución:</strong> Simplifica curvas, exporta solo capas necesarias, reduce densidad de puntos.
+      </p>
+    </div>
+
+    <div>
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">4. Textos de cotas ilegibles</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Altura de texto inadecuada para la escala.<br>
+        <strong>Solución:</strong> Ajusta altura de texto en el software antes de exportar (0.5-1.0 m en escala 1:100).
+      </p>
+    </div>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Conclusión
+  </h2>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    El flujo completo desde el levantamiento topográfico hasta el archivo DXF requiere cuidado en cada etapa: 
+    toma de datos precisa en campo, procesamiento correcto en gabinete y exportación organizada. Un DXF 
+    topográfico bien estructurado es la base para proyectos de ingeniería civil, arquitectura y construcción.
+  </p>
+
+  <p style="line-height:1.8; margin-bottom:2rem;">
+    Dominar este proceso te permite entregar productos de alta calidad profesional, facilitando el trabajo 
+    de arquitectos, ingenieros y constructores que usarán tu levantamiento para diseñar y construir proyectos reales.
+  </p>
+
+  <!-- ── ARTÍCULOS RELACIONADOS ──────────────────────────────── -->
+  <div style="background:var(--bg-alt); padding:2rem; border-radius:8px; margin:3rem 0;">
+    <h3 style="color:var(--accent2); font-size:1.2rem; margin-bottom:1.5rem;">
+      📚 Artículos relacionados
+    </h3>
+    <div style="display:grid; gap:1rem;">
+      <a href="/blog/topografia-construccion" style="color:var(--text); text-decoration:none; padding:1rem; background:var(--bg); border-radius:6px; display:block; border:1px solid var(--border); transition:border-color 0.2s;">
+        <strong style="color:var(--accent2);">🗺️ Fundamentos de topografía para construcción</strong><br>
+        <span style="color:var(--muted); font-size:.9rem;">Conceptos básicos de topografía aplicados a proyectos de construcción</span>
+      </a>
+      <a href="/blog/planos-construccion" style="color:var(--text); text-decoration:none; padding:1rem; background:var(--bg); border-radius:6px; display:block; border:1px solid var(--border); transition:border-color 0.2s;">
+        <strong style="color:var(--accent2);">📐 Interpretar planos de construcción</strong><br>
+        <span style="color:var(--muted); font-size:.9rem;">Aprende a leer planos arquitectónicos, estructurales e instalaciones</span>
+      </a>
+      <a href="/blog/diferencias-dxf-dwg" style="color:var(--text); text-decoration:none; padding:1rem; background:var(--bg); border-radius:6px; display:block; border:1px solid var(--border); transition:border-color 0.2s;">
+        <strong style="color:var(--accent2);">⚙️ Diferencias entre DXF y DWG</strong><br>
+        <span style="color:var(--muted); font-size:.9rem;">Guía completa sobre formatos CAD para tu proyecto</span>
+      </a>
+    </div>
+  </div>
+
+</article>
+
+<footer>
+  <strong>Lu CAD Studio</strong> — lucadstudio.com &nbsp;|&nbsp;
+  <a href="/imagen" style="color:var(--accent2)">Imagen→DXF</a> &nbsp;|&nbsp;
+  <a href="/limpieza" style="color:var(--accent2)">Quitar fondo</a> &nbsp;|&nbsp;
+  <a href="/texto" style="color:var(--accent2)">Texto→DXF</a> &nbsp;|&nbsp;
+  <a href="/blog" style="color:var(--accent2)">Blog</a> &nbsp;|&nbsp;
+  <a href="/privacidad" style="color:var(--accent2)">Privacidad</a> &nbsp;|&nbsp;
+  <a href="/docs" style="color:var(--accent2)">API</a>
+</footer>
+
+</body>
+</html>

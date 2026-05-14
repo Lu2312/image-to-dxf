@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>De AutoCAD a Unity3D pasando por Blender: Guía Completa | lucadstudio.com</title>
+  <meta name="description" content="Aprende el workflow completo para llevar modelos desde AutoCAD DXF a Blender y finalmente a Unity3D. Importación, optimización y exportación paso a paso para arquitectura y game development."/>
+  <link rel="canonical" href="https://lucadstudio.com/blog/dxf-blender-unity"/>
+  
+  <!-- Google AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-3833242390185896">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3833242390185896"
+     crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="/static/css/arqgen.css"/>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">Lu CAD Studio</a>
+  <a href="/imagen" class="nav-highlight">🖼️ Imagen→DXF</a>
+  <a href="/limpieza" class="nav-highlight">🧼 Quitar fondo</a>
+  <a href="/texto" class="nav-highlight">✏️ Texto→DXF</a>
+  <a href="/blog" class="nav-highlight">📚 Blog</a>
+  <a href="/#planes">Planes</a>
+  <a href="/docs" target="_blank">API</a>
+</nav>
+
+<!-- ── BANNER AD TOP (728×90 leaderboard) ──────────────────── -->
+<div class="ad-slot ad-leaderboard" aria-label="Publicidad">
+  <div class="ad-placeholder">
+    <span class="ad-label">Publicidad</span>
+    <span class="ad-size">728 × 90</span>
+  </div>
+</div>
+
+<article class="container" style="max-width:800px; padding:2rem 1rem;">
+  
+  <!-- ── HEADER DEL ARTÍCULO ──────────────────────────────── -->
+  <div style="margin-bottom:2rem;">
+    <a href="/blog" style="color:var(--accent2); text-decoration:none; font-size:.9rem; display:inline-flex; align-items:center; gap:.5rem;">
+      ← Volver al Blog
+    </a>
+  </div>
+
+  <header style="margin-bottom:2.5rem;">
+    <span class="badge">🎮 Workflow 3D</span>
+    <h1 style="font-size:2.25rem; margin:.75rem 0 1rem; line-height:1.2;">
+      De AutoCAD a Unity3D pasando por Blender: Guía Completa
+    </h1>
+    <div style="color:var(--muted); font-size:.95rem; display:flex; gap:1.5rem; flex-wrap:wrap;">
+      <span>📅 Mayo 2026</span>
+      <span>⏱️ 15 minutos de lectura</span>
+      <span>🎮 CAD · 3D · Game Dev</span>
+    </div>
+  </header>
+
+  <!-- ── IMAGEN PRINCIPAL ──────────────────────────────────── -->
+  <div style="background:linear-gradient(135deg, #8b5cf6, #ec4899); height:300px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:2.5rem; font-size:5rem;">
+    🎮
+  </div>
+  <p style="text-align:center; color:var(--muted); font-size:.85rem; margin-top:-1.5rem; margin-bottom:2.5rem;">
+    <em>El pipeline completo: AutoCAD → Blender → Unity3D</em>
+  </p>
+
+  <!-- ── CONTENIDO DEL ARTÍCULO ──────────────────────────────── -->
+  
+  <p style="font-size:1.1rem; color:var(--muted); line-height:1.8; margin-bottom:2rem;">
+    Este artículo cubre el flujo de trabajo completo para llevar modelos arquitectónicos o mecánicos desde 
+    AutoCAD (formato DXF/DWG) a Blender para modelado 3D y finalmente a Unity3D para visualización interactiva, 
+    recorridos virtuales o videojuegos. Ideal para arquitectos, diseñadores de videojuegos y visualizadores 3D.
+  </p>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    El Pipeline Completo
+  </h2>
+
+  <div style="background:var(--bg-alt); padding:2rem; border-radius:8px; margin:2rem 0; border:2px solid var(--accent1);">
+    <div style="display:grid; gap:1.5rem;">
+      <div>
+        <strong style="color:var(--accent2); font-size:1.1rem;">1. AutoCAD → DXF/DWG</strong>
+        <p style="margin:.5rem 0 0; line-height:1.6; color:var(--muted);">
+          Exporta tus planos, alzados y cortes desde AutoCAD. El DXF contiene geometría vectorial 2D/3D.
+        </p>
+      </div>
+      <div>
+        <strong style="color:var(--accent2); font-size:1.1rem;">2. Blender → Modelado 3D</strong>
+        <p style="margin:.5rem 0 0; line-height:1.6; color:var(--muted);">
+          Importa DXF a Blender, extruye geometría, añade texturas y materiales. Genera el modelo 3D completo.
+        </p>
+      </div>
+      <div>
+        <strong style="color:var(--accent2); font-size:1.1rem;">3. Unity3D → Visualización Interactiva</strong>
+        <p style="margin:.5rem 0 0; line-height:1.6; color:var(--muted);">
+          Exporta FBX desde Blender e importa a Unity. Añade iluminación, físicas, scripts y crea experiencias interactivas.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Parte 1: Preparar y Exportar desde AutoCAD
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📐 Limpiar el archivo DWG antes de exportar
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Antes de exportar desde AutoCAD, limpia el archivo para facilitar el trabajo en Blender:
+  </p>
+
+  <ul style="line-height:1.9; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Elimina cotas, textos y acotaciones:</strong> No son necesarias en el modelo 3D</li>
+    <li><strong>Borra capas innecesarias:</strong> Mantén solo geometría arquitectónica/estructural</li>
+    <li><strong>Simplifica bloques complejos:</strong> Explota bloques con comando <code style="background:var(--bg-alt); padding:.2rem .5rem;">EXPLODE</code></li>
+    <li><strong>Une polylines fragmentadas:</strong> Usa <code style="background:var(--bg-alt); padding:.2rem .5rem;">JOIN</code> para crear contornos cerrados</li>
+    <li><strong>Verifica que las polylines estén cerradas:</strong> Paredes deben ser polígonos cerrados</li>
+    <li><strong>Organiza por capas:</strong> MUROS, VENTANAS, PUERTAS, LOSA, etc.</li>
+  </ul>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; border-left:4px solid var(--accent1); margin:2rem 0;">
+    <p style="margin:0; color:var(--text);">
+      <strong>💡 Tip profesional:</strong> Usa el comando <code style="background:var(--bg); padding:.2rem .5rem;">OVERKILL</code> 
+      para eliminar líneas duplicadas y superpuestas. Esto reduce significativamente el tamaño del archivo y facilita 
+      la importación en Blender.
+    </p>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    💾 Exportar a DXF desde AutoCAD
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Sigue estos pasos para exportar correctamente:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Archivo → Guardar Como → Selecciona formato "AutoCAD DXF (*.dxf)"</strong></li>
+    <li><strong>Versión recomendada:</strong> AutoCAD 2010/R2010 (máxima compatibilidad)</li>
+    <li><strong>Unidades:</strong> Verifica que sean milímetros o metros (consistente con tu proyecto)</li>
+    <li><strong>Sistema de coordenadas:</strong> Mueve el modelo al origen (0,0,0) si es necesario</li>
+    <li><strong>Guarda el archivo:</strong> Usa un nombre descriptivo (ej: casa_planta_baja.dxf)</li>
+  </ol>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    <strong>Alternativa: Exportar directamente a 3D DWG</strong><br>
+    Si trabajas en AutoCAD 3D, puedes exportar directamente el modelo tridimensional en formato DWG, 
+    que Blender también puede importar.
+  </p>
+
+  <!-- AD SLOT — Rectangle 300×250 -->
+  <div class="ad-slot ad-rectangle" aria-label="Publicidad" style="margin:2.5rem auto;">
+    <div class="ad-placeholder">
+      <span class="ad-label">Publicidad</span>
+      <span class="ad-size">300 × 250</span>
+    </div>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Parte 2: Importar DXF a Blender
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📥 Importar archivo DXF en Blender
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Blender tiene soporte nativo para archivos DXF desde la versión 2.8+:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Abre <strong>Blender</strong> (se recomienda 3.0 o superior)</li>
+    <li>Elimina la escena por defecto: <strong>A (select all) → X → Delete</strong></li>
+    <li>Menú <strong>File → Import → AutoCAD DXF (.dxf)</strong></li>
+    <li>Navega a tu archivo y selecciónalo</li>
+    <li>En las opciones de importación (panel derecho):
+      <ul style="margin-top:.5rem; line-height:1.8;">
+        <li><strong>Scale:</strong> Ajusta según unidades (si tu DXF está en metros y Blender en metros, deja 1.0)</li>
+        <li><strong>Merge by Layer:</strong> Activa para agrupar objetos por capa de AutoCAD</li>
+        <li><strong>Import Curves:</strong> Desactiva si solo quieres geometría de malla</li>
+      </ul>
+    </li>
+    <li>Clic en <strong>Import DXF</strong></li>
+  </ol>
+
+  <div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <p style="margin:0 0 .5rem; color:#92400e; font-weight:600;">⚠️ Problema común: El modelo aparece muy pequeño o muy grande</p>
+    <p style="margin:0; color:#78350f; line-height:1.6;">
+      <strong>Causa:</strong> Diferencia de unidades entre AutoCAD y Blender.<br>
+      <strong>Solución:</strong> Selecciona todo (A), presiona S (scale), escribe el factor de escala 
+      (ej: 0.001 si tu DXF está en mm y Blender en metros), Enter.
+    </p>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🔧 Convertir curvas a mallas
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    El DXF importado generalmente viene como <strong>Curves</strong> (curvas). Para trabajar en 3D, necesitas 
+    convertirlas a <strong>Meshes</strong> (mallas):
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Selecciona todos los objetos importados: <strong>A (Select All)</strong></li>
+    <li>Menú <strong>Object → Convert To → Mesh</strong></li>
+    <li>O usa el atajo: <strong>Alt + C → Mesh from Curve</strong></li>
+  </ol>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🏗️ Extruir geometría 2D a 3D
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Ahora convierte las plantas 2D en modelos 3D con volumen:
+  </p>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <p style="margin:0 0 1rem; font-weight:600; color:var(--accent2);">Ejemplo: Extruir muros de 2.5 metros de altura</p>
+    <ol style="line-height:2; margin:0; padding-left:1.5rem;">
+      <li>Selecciona el objeto que representa los muros</li>
+      <li>Entra en <strong>Edit Mode</strong>: Tab</li>
+      <li>Selecciona todas las aristas: <strong>A</strong></li>
+      <li>Extruye hacia arriba: <strong>E → Z → 2.5 → Enter</strong></li>
+      <li>Vuelve a <strong>Object Mode</strong>: Tab</li>
+    </ol>
+  </div>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Repite el proceso para cada capa:
+  </p>
+
+  <ul style="line-height:1.9; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Muros:</strong> Extruir 2.5-3.0 m</li>
+    <li><strong>Losa de piso:</strong> Extruir 0.15 m hacia abajo</li>
+    <li><strong>Losa de entrepiso:</strong> Extruir 0.20 m a la altura correspondiente</li>
+    <li><strong>Ventanas:</strong> Extruir grosor del marco (0.05-0.10 m)</li>
+  </ul>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🎨 Añadir materiales y texturas
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Para que el modelo se vea realista en Unity, añade materiales básicos en Blender:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Selecciona un objeto (ej: muros)</li>
+    <li>En el panel derecho, ve a <strong>Material Properties</strong> (icono de esfera)</li>
+    <li>Clic en <strong>+ New</strong> para crear un material</li>
+    <li>Cambia el color base en <strong>Base Color</strong></li>
+    <li>Opcional: Añade texturas de imagen en <strong>Shading workspace</strong></li>
+    <li>Repite para cada tipo de elemento (muros, pisos, ventanas)</li>
+  </ol>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; border-left:4px solid var(--accent1); margin:2rem 0;">
+    <p style="margin:0; color:var(--text);">
+      <strong>💡 Tip para Unity:</strong> Usa materiales simples en Blender (colores sólidos o texturas básicas). 
+      Los materiales complejos de Cycles o Eevee no se transfieren bien a Unity. Es mejor añadir materiales 
+      detallados directamente en Unity.
+    </p>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🧹 Optimizar el modelo para Unity
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Antes de exportar, optimiza el modelo para que funcione bien en tiempo real:
+  </p>
+
+  <ul style="line-height:1.9; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Elimina duplicados:</strong> Selecciona todo → M → By Distance (fusiona vértices cercanos)</li>
+    <li><strong>Recalcula normales:</strong> Edit Mode → A → Alt + N → Recalculate Outside</li>
+    <li><strong>Triangula caras:</strong> Ctrl + T (Unity usa triángulos, no quads)</li>
+    <li><strong>Aplica transformaciones:</strong> Object Mode → Ctrl + A → All Transforms</li>
+    <li><strong>Reduce polígonos:</strong> Usa modifier <strong>Decimate</strong> si el modelo es muy pesado</li>
+    <li><strong>Nombra objetos claramente:</strong> Muros_PB, Ventanas_PB, Losa_Superior</li>
+  </ul>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Parte 3: Exportar de Blender a Unity3D
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    📤 Exportar como FBX desde Blender
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Unity funciona mejor con formato <strong>FBX</strong>. Para exportar desde Blender:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Selecciona todos los objetos que quieres exportar (o déjalos todos si es todo el modelo)</li>
+    <li>Menú <strong>File → Export → FBX (.fbx)</strong></li>
+    <li><strong>Configuración importante (panel derecho):</strong>
+      <ul style="margin-top:.5rem; line-height:1.8;">
+        <li><strong>Scale:</strong> 1.0 (o ajusta según necesites)</li>
+        <li><strong>Apply Scalings:</strong> FBX Units Scale</li>
+        <li><strong>Forward:</strong> -Z Forward</li>
+        <li><strong>Up:</strong> Y Up</li>
+        <li><strong>Selected Objects:</strong> Activa si solo quieres exportar lo seleccionado</li>
+        <li><strong>Object Types:</strong> Marca Mesh, Empty (desactiva Armature, Camera, Lamp si no los necesitas)</li>
+        <li><strong>Apply Modifiers:</strong> Activa</li>
+        <li><strong>Path Mode:</strong> Copy (copia texturas en carpeta del FBX)</li>
+      </ul>
+    </li>
+    <li>Clic en <strong>Export FBX</strong></li>
+  </ol>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; border-left:4px solid var(--accent1); margin:2rem 0;">
+    <p style="margin:0; color:var(--text);">
+      <strong>💡 Orientación de ejes:</strong> Unity usa Z hacia adelante y Y hacia arriba. 
+      La configuración <strong>-Z Forward, Y Up</strong> asegura que tu modelo aparezca con la orientación correcta.
+    </p>
+  </div>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🎮 Importar FBX en Unity3D
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Una vez tengas el archivo FBX, importarlo a Unity es muy sencillo:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Abre tu proyecto en <strong>Unity Editor</strong></li>
+    <li>En el panel <strong>Project</strong>, crea una carpeta llamada <strong>Models</strong></li>
+    <li>Arrastra el archivo .fbx desde el explorador de Windows a la carpeta Models</li>
+    <li>Unity importará automáticamente el modelo</li>
+    <li>Clic en el archivo FBX en Unity para ver sus <strong>Import Settings</strong>:
+      <ul style="margin-top:.5rem; line-height:1.8;">
+        <li><strong>Scale Factor:</strong> Ajusta si el modelo aparece muy grande/pequeño (prueba 1, 0.01, o 100)</li>
+        <li><strong>Generate Colliders:</strong> Activa si necesitas físicas</li>
+        <li><strong>Mesh Compression:</strong> Medium (reduce tamaño sin perder mucha calidad)</li>
+        <li><strong>Import Materials:</strong> Activa, Unity intentará importar materiales de Blender</li>
+      </ul>
+    </li>
+    <li>Clic en <strong>Apply</strong></li>
+  </ol>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🏗️ Añadir el modelo a la escena
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Para usar el modelo en tu escena de Unity:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Desde el panel <strong>Project</strong>, arrastra el FBX a la ventana <strong>Hierarchy</strong> o <strong>Scene</strong></li>
+    <li>El modelo aparecerá en la escena</li>
+    <li>Usa las herramientas de transformación (W, E, R) para posicionarlo</li>
+    <li>Ajusta el <strong>Transform</strong> en el Inspector:
+      <ul style="margin-top:.5rem; line-height:1.8;">
+        <li><strong>Position:</strong> (0, 0, 0) para centrar en el origen</li>
+        <li><strong>Rotation:</strong> (0, 0, 0) o ajusta según necesites</li>
+        <li><strong>Scale:</strong> (1, 1, 1) o ajusta si el tamaño no es correcto</li>
+      </ul>
+    </li>
+  </ol>
+
+  <!-- AD SLOT — Banner responsive -->
+  <div class="ad-slot ad-banner" aria-label="Publicidad" style="margin:2.5rem auto;">
+    <div class="ad-placeholder ad-placeholder-wide">
+      <span class="ad-label">Publicidad</span>
+      <span class="ad-size">Banner Responsive</span>
+    </div>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Optimización y Mejoras en Unity
+  </h2>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    💡 Iluminación y Lightmaps
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Para que tu modelo arquitectónico se vea profesional:
+  </p>
+
+  <ul style="line-height:1.9; margin-bottom:2rem; padding-left:1.5rem;">
+    <li><strong>Añade luces direccionales:</strong> Simula luz del sol (GameObject → Light → Directional Light)</li>
+    <li><strong>Marca objetos como Static:</strong> Selecciona modelo → Inspector → marca "Static" → "Lightmap Static"</li>
+    <li><strong>Baking lightmaps:</strong> Window → Rendering → Lighting → Generate Lighting (puede tomar minutos)</li>
+    <li><strong>Post-processing:</strong> Añade Bloom, Color Grading y Ambient Occlusion para realismo</li>
+  </ul>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🎨 Reemplazar materiales
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Los materiales importados desde Blender suelen verse planos. Crea materiales PBR en Unity:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>En <strong>Project</strong>, crea carpeta <strong>Materials</strong></li>
+    <li>Clic derecho → Create → Material</li>
+    <li>Nombra el material (ej: "Muro_Concreto")</li>
+    <li>En Inspector, configura:
+      <ul style="margin-top:.5rem; line-height:1.8;">
+        <li><strong>Albedo:</strong> Color base o textura de difuso</li>
+        <li><strong>Metallic:</strong> 0 para concreto/madera, 1 para metal</li>
+        <li><strong>Smoothness:</strong> 0.2-0.4 para concreto, 0.8-1.0 para metal pulido</li>
+        <li><strong>Normal Map:</strong> Añade textura de normales para detalle</li>
+      </ul>
+    </li>
+    <li>Arrastra el material al modelo en la escena</li>
+  </ol>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🚶 Añadir cámara de primera persona
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Para crear un recorrido virtual interactivo:
+  </p>
+
+  <ol style="line-height:2; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Descarga el paquete <strong>Standard Assets</strong> desde Asset Store (gratis)</li>
+    <li>O usa el paquete <strong>First Person Character Controller</strong></li>
+    <li>Arrastra el prefab <strong>FPSController</strong> a tu escena</li>
+    <li>Posiciónalo en el interior del modelo arquitectónico</li>
+    <li>Ajusta la altura (Position Y) para que esté a 1.7m del suelo (altura de ojos)</li>
+    <li>Presiona <strong>Play</strong> y usa WASD + mouse para recorrer</li>
+  </ol>
+
+  <h3 style="color:var(--text); font-size:1.2rem; margin:2rem 0 .75rem;">
+    🔊 Colisiones y físicas
+  </h3>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    Para que el personaje no atraviese paredes:
+  </p>
+
+  <ul style="line-height:1.9; margin-bottom:2rem; padding-left:1.5rem;">
+    <li>Selecciona el modelo importado</li>
+    <li>En Inspector, añade componente <strong>Mesh Collider</strong> (Add Component → Mesh Collider)</li>
+    <li>Marca <strong>Convex</strong> si necesitas físicas (opcional)</li>
+    <li>O añade <strong>Box Collider</strong> manualmente para cada muro (más optimizado)</li>
+  </ul>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Casos de Uso Prácticos
+  </h2>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    
+    <h4 style="color:var(--accent2); margin-bottom:1rem;">🏠 Recorridos Virtuales de Arquitectura</h4>
+    <p style="line-height:1.8; margin-bottom:2rem; color:var(--muted);">
+      Presenta proyectos arquitectónicos a clientes con recorridos interactivos en tiempo real. 
+      Los clientes pueden "caminar" por la casa antes de construirse, cambiar materiales y ver 
+      diferentes opciones de diseño.
+    </p>
+
+    <h4 style="color:var(--accent2); margin-bottom:1rem;">🎮 Niveles de Videojuegos</h4>
+    <p style="line-height:1.8; margin-bottom:2rem; color:var(--muted);">
+      Usa planos arquitectónicos reales como base para diseñar niveles de videojuegos. 
+      Los edificios, casas y espacios urbanos modelados desde DXF tienen proporciones realistas 
+      perfectas para juegos de simulación o aventuras.
+    </p>
+
+    <h4 style="color:var(--accent2); margin-bottom:1rem;">🏗️ Simuladores de Construcción</h4>
+    <p style="line-height:1.8; margin-bottom:2rem; color:var(--muted);">
+      Crea experiencias educativas donde estudiantes de arquitectura e ingeniería puedan visualizar 
+      procesos constructivos paso a paso en 3D interactivo.
+    </p>
+
+    <h4 style="color:var(--accent2); margin-bottom:1rem;">🥽 Realidad Virtual (VR)</h4>
+    <p style="line-height:1.8; margin:0; color:var(--muted);">
+      Exporta el proyecto de Unity a Meta Quest, PSVR o SteamVR. Los clientes pueden experimentar 
+      el espacio arquitectónico en escala real con inmersión total.
+    </p>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Problemas Comunes y Soluciones
+  </h2>
+
+  <div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    
+    <div style="margin-bottom:1.5rem;">
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">1. Modelo aparece muy pequeño en Unity</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Diferencia de escala entre Blender y Unity.<br>
+        <strong>Solución:</strong> Ajusta <strong>Scale Factor</strong> en Import Settings del FBX (prueba 100 o 0.01).
+      </p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;">
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">2. Caras invertidas (se ven negras)</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Normales invertidas.<br>
+        <strong>Solución:</strong> En Blender, Edit Mode → A → Alt + N → Recalculate Outside. Exporta de nuevo.
+      </p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;">
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">3. Materiales no se importan correctamente</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Unity no reconoce materiales complejos de Cycles/Eevee.<br>
+        <strong>Solución:</strong> Crea materiales nuevos directamente en Unity con el render pipeline que uses (URP/HDRP/Built-in).
+      </p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;">
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">4. Modelo con demasiados polígonos (lag en Unity)</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> Geometría sin optimizar.<br>
+        <strong>Solución:</strong> En Blender, usa modifier <strong>Decimate</strong> (ratio 0.5-0.7) antes de exportar. 
+        O simplifica manualmente en Edit Mode.
+      </p>
+    </div>
+
+    <div>
+      <strong style="color:#78350f; display:block; margin-bottom:.3rem;">5. Objetos están separados (no en jerarquía)</strong>
+      <p style="margin:0; color:#78350f; line-height:1.6;">
+        <strong>Causa:</strong> No agrupaste objetos en Blender.<br>
+        <strong>Solución:</strong> En Unity, selecciona múltiples objetos → Clic derecho → Create Empty Parent. 
+        O en Blender, usa Empty Objects como padres antes de exportar.
+      </p>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg, var(--accent1), var(--accent2)); padding:2rem; border-radius:8px; margin:3rem 0; text-align:center;">
+    <h3 style="color:white; font-size:1.3rem; margin-bottom:1rem;">
+      ¿Necesitas convertir planos a DXF primero?
+    </h3>
+    <p style="color:rgba(255,255,255,0.9); margin-bottom:1.5rem; line-height:1.6;">
+      Si tienes planos en imagen (JPG, PNG, escaneos), conviértelos primero a DXF vectorial 
+      antes de importarlos a Blender. Nuestra herramienta gratuita lo hace en segundos.
+    </p>
+    <a href="/imagen" class="btn" style="background:white; color:var(--accent1); display:inline-flex; align-items:center; gap:.5rem; font-weight:600;">
+      🖼️ Convertir Imagen → DXF
+    </a>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Recursos Adicionales
+  </h2>
+
+  <div style="background:var(--bg-alt); padding:1.5rem; border-radius:8px; margin:2rem 0;">
+    <h4 style="color:var(--accent2); margin-bottom:1rem;">📚 Software y Plugins Útiles</h4>
+    <ul style="line-height:2; margin:0; padding-left:1.5rem;">
+      <li><strong>Blender:</strong> Gratis, open source — blender.org</li>
+      <li><strong>Unity3D Personal:</strong> Gratis para proyectos pequeños — unity.com</li>
+      <li><strong>ArchiCAD-Unity Bridge:</strong> Plugin para conexión directa desde ArchiCAD</li>
+      <li><strong>Unity Reflect:</strong> Herramienta oficial de Unity para visualización arquitectónica</li>
+      <li><strong>ProBuilder:</strong> Plugin de Unity para modelado básico dentro del editor</li>
+    </ul>
+  </div>
+
+  <h2 style="color:var(--accent2); font-size:1.5rem; margin:2.5rem 0 1rem;">
+    Conclusión
+  </h2>
+
+  <p style="line-height:1.8; margin-bottom:1.5rem;">
+    El pipeline AutoCAD → Blender → Unity3D es poderoso para crear experiencias arquitectónicas interactivas, 
+    recorridos virtuales y niveles de videojuegos basados en planos reales. Aunque el proceso tiene varios 
+    pasos, una vez dominado te permitirá llevar cualquier diseño CAD a una experiencia 3D inmersiva.
+  </p>
+
+  <p style="line-height:1.8; margin-bottom:2rem;">
+    La clave está en limpiar bien el DXF en AutoCAD, optimizar la geometría en Blender y configurar 
+    correctamente los materiales e iluminación en Unity. Con práctica, podrás crear visualizaciones 
+    profesionales que impresionen a clientes y usuarios.
+  </p>
+
+  <!-- ── ARTÍCULOS RELACIONADOS ──────────────────────────────── -->
+  <div style="background:var(--bg-alt); padding:2rem; border-radius:8px; margin:3rem 0;">
+    <h3 style="color:var(--accent2); font-size:1.2rem; margin-bottom:1.5rem;">
+      📚 Artículos relacionados
+    </h3>
+    <div style="display:grid; gap:1rem;">
+      <a href="/blog/convertir-fotos-modelos-3d" style="color:var(--text); text-decoration:none; padding:1rem; background:var(--bg); border-radius:6px; display:block; border:1px solid var(--border); transition:border-color 0.2s;">
+        <strong style="color:var(--accent2);">🏗️ Convertir fotos en modelos 3D para impresión</strong><br>
+        <span style="color:var(--muted); font-size:.9rem;">Del concepto 2D al modelo 3D imprimible con Blender</span>
+      </a>
+      <a href="/blog/diferencias-dxf-dwg" style="color:var(--text); text-decoration:none; padding:1rem; background:var(--bg); border-radius:6px; display:block; border:1px solid var(--border); transition:border-color 0.2s;">
+        <strong style="color:var(--accent2);">⚙️ Diferencias entre DXF y DWG</strong><br>
+        <span style="color:var(--muted); font-size:.9rem;">Qué formato usar según tu proyecto CAD</span>
+      </a>
+      <a href="/blog/preparar-logo-jpg-para-dxf" style="color:var(--text); text-decoration:none; padding:1rem; background:var(--bg); border-radius:6px; display:block; border:1px solid var(--border); transition:border-color 0.2s;">
+        <strong style="color:var(--accent2);">🖼️ Preparar imágenes para conversión DXF</strong><br>
+        <span style="color:var(--muted); font-size:.9rem;">Optimiza logos y escaneos antes de vectorizar</span>
+      </a>
+    </div>
+  </div>
+
+</article>
+
+<footer>
+  <strong>Lu CAD Studio</strong> — lucadstudio.com &nbsp;|&nbsp;
+  <a href="/imagen" style="color:var(--accent2)">Imagen→DXF</a> &nbsp;|&nbsp;
+  <a href="/limpieza" style="color:var(--accent2)">Quitar fondo</a> &nbsp;|&nbsp;
+  <a href="/texto" style="color:var(--accent2)">Texto→DXF</a> &nbsp;|&nbsp;
+  <a href="/blog" style="color:var(--accent2)">Blog</a> &nbsp;|&nbsp;
+  <a href="/privacidad" style="color:var(--accent2)">Privacidad</a> &nbsp;|&nbsp;
+  <a href="/docs" style="color:var(--accent2)">API</a>
+</footer>
+
+</body>
+</html>

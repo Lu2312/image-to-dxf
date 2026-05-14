@@ -100,6 +100,46 @@ def page_blog_3d():
     return FileResponse(TEMPLATES / "blog_3d.html")
 
 
+@app.get("/blog/topografia-construccion", response_class=FileResponse)
+def page_blog_topografia():
+    return FileResponse(TEMPLATES / "blog_topografia.html")
+
+
+@app.get("/blog/planos-construccion", response_class=FileResponse)
+def page_blog_planos():
+    return FileResponse(TEMPLATES / "blog_planos_construccion.html")
+
+
+@app.get("/blog/levantamiento-dxf", response_class=FileResponse)
+def page_blog_levantamiento():
+    return FileResponse(TEMPLATES / "blog_levantamiento_dxf.html")
+
+
+@app.get("/blog/dxf-blender-unity", response_class=FileResponse)
+def page_blog_blender_unity():
+    return FileResponse(TEMPLATES / "blog_dxf_blender_unity.html")
+
+
+@app.get("/sobre-nosotros", response_class=FileResponse)
+def page_sobre_nosotros():
+    return FileResponse(TEMPLATES / "sobre-nosotros.html")
+
+
+@app.get("/contacto", response_class=FileResponse)
+def page_contacto():
+    return FileResponse(TEMPLATES / "contacto.html")
+
+
+@app.get("/terminos", response_class=FileResponse)
+def page_terminos():
+    return FileResponse(TEMPLATES / "terminos.html")
+
+
+@app.get("/faq", response_class=FileResponse)
+def page_faq():
+    return FileResponse(TEMPLATES / "faq.html")
+
+
 @app.get("/ads.txt", response_class=FileResponse)
 def ads_txt():
     return FileResponse(BASE / "ads.txt", media_type="text/plain")
